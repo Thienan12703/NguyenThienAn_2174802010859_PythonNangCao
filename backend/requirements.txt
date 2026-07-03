@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+motor
+beanie
+pydantic[email]
+passlib[bcrypt]
+pyjwt
+python-multipart
+google-genai
+python-dotenv

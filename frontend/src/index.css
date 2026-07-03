@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* Custom design tokens */
+:root {
+  --color-primary: #39ff14; /* Neon Green */
+  --color-primary-dark: #32e612;
+  --color-primary-light: #5eff3d;
+  --color-accent: #ffffff;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-surface: #ffffff;
+  --color-surface-dark: #111111; /* Black/Dark Gray */
+  --color-border: #e5e7eb;
+  --color-text: #111111;
+  --color-text-muted: #6b7280;
+  --color-neon-glow: rgba(57, 255, 20, 0.4);
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-primary-light: var(--color-primary-light);
+  --color-surface: var(--color-surface);
+  --color-surface-dark: var(--color-surface-dark);
+}
+
+/* Base resets */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
