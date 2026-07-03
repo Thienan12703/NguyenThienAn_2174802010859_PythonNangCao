@@ -12,6 +12,26 @@ const AdminProducts = () => {
     const [success, setSuccess] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [generatingAI, setGeneratingAI] = useState(false);
+
+    const handleAIGenerateDesc = async () => {
+        if (!newProduct.name || !newProduct.brand) {
+            alert('Vui lòng nhập Tên sản phẩm và Thương hiệu trước khi dùng AI!');
+            return;
+        }
+        setGeneratingAI(true);
+        try {
+            const { data } = await axiosClient.post('/api/ai/generate-description', {
+                name: newProduct.name,
+                brand: newProduct.brand
+            });
+            setNewProduct({ ...newProduct, description: data.description });
+        } catch (err) {
+            alert('Lỗi khi gọi AI: ' + (err.response?.data?.detail || err.message));
+        } finally {
+            setGeneratingAI(false);
+        }
+    };
 
     const fetchData = async () => {
         try {
@@ -301,7 +321,17 @@ const AdminProducts = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Mô tả sản phẩm *</label>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <label className="block text-sm font-bold text-gray-700">Mô tả sản phẩm *</label>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleAIGenerateDesc}
+                                            disabled={generatingAI}
+                                            className="text-xs font-bold px-3 py-1 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg flex items-center gap-1 transition-colors disabled:opacity-50"
+                                        >
+                                            {generatingAI ? 'Đang viết...' : '✨ Viết mô tả bằng AI'}
+                                        </button>
+                                    </div>
                                     <textarea 
                                         value={newProduct.description} 
                                         onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} 

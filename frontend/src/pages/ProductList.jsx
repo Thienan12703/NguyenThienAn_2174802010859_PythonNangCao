@@ -21,20 +21,28 @@ const ProductList = () => {
         const queryParams = new URLSearchParams(location.search);
         const searchKeyword = queryParams.get('keyword') || '';
         const searchCategory = queryParams.get('category') || '';
+        const aiQuery = queryParams.get('ai_query') || '';
         
         if (searchKeyword) setKeyword(searchKeyword);
+        if (aiQuery) setKeyword(aiQuery + " (AI Search)");
         if (searchCategory) setCategoryFilter(searchCategory);
 
         const fetchData = async () => {
             setLoading(true);
             try {
-                const [productsRes, categoriesRes] = await Promise.all([
-                    axiosClient.get(`/api/products?keyword=${searchKeyword}`),
-                    axiosClient.get('/api/categories'),
-                ]);
+                let productsData = [];
+                const categoriesRes = await axiosClient.get('/api/categories');
                 
-                let filteredProducts = productsRes.data;
-                if (searchCategory) {
+                if (aiQuery) {
+                    const aiRes = await axiosClient.post('/api/ai/smart-search', { query: aiQuery });
+                    productsData = aiRes.data.products || [];
+                } else {
+                    const productsRes = await axiosClient.get(`/api/products?keyword=${searchKeyword}`);
+                    productsData = productsRes.data;
+                }
+                
+                let filteredProducts = productsData;
+                if (searchCategory && !aiQuery) {
                     filteredProducts = filteredProducts.filter(p => p.category?.slug === searchCategory || p.category?._id === searchCategory);
                 }
                 

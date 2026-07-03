@@ -30,10 +30,14 @@ const Header = () => {
         fetchProfile();
     }, [token, logout, setUser]);
 
-    const handleSearch = (e) => {
+    const handleSearch = (e, isAI = false) => {
         e.preventDefault();
         if (searchKeyword.trim()) {
-            navigate(`/products?keyword=${searchKeyword}`);
+            if (isAI) {
+                navigate(`/products?ai_query=${searchKeyword}`);
+            } else {
+                navigate(`/products?keyword=${searchKeyword}`);
+            }
             setIsMenuOpen(false);
         }
     };
@@ -60,16 +64,26 @@ const Header = () => {
 
                     {/* Desktop Search & Actions */}
                     <div className="hidden md:flex items-center space-x-6">
-                        <form onSubmit={handleSearch} className="relative">
-                            <input 
-                                type="text" 
-                                placeholder="Tìm kiếm..." 
-                                value={searchKeyword}
-                                onChange={(e) => setSearchKeyword(e.target.value)}
-                                className="bg-gray-900 border border-gray-700 text-white text-sm rounded-full pl-4 pr-10 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-48 transition-all"
-                            />
-                            <button type="submit" className="absolute right-3 top-2.5 text-gray-400 hover:text-primary">
-                                <Search size={18} />
+                        <form onSubmit={(e) => handleSearch(e, false)} className="relative flex items-center">
+                            <div className="relative">
+                                <input 
+                                    type="text" 
+                                    placeholder="Tìm kiếm..." 
+                                    value={searchKeyword}
+                                    onChange={(e) => setSearchKeyword(e.target.value)}
+                                    className="bg-gray-900 border border-gray-700 text-white text-sm rounded-full pl-4 pr-10 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-48 transition-all"
+                                />
+                                <button type="submit" className="absolute right-3 top-2.5 text-gray-400 hover:text-primary" title="Tìm kiếm thông thường">
+                                    <Search size={18} />
+                                </button>
+                            </div>
+                            <button 
+                                type="button"
+                                onClick={(e) => handleSearch(e, true)}
+                                className="ml-2 bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-full transition-colors"
+                                title="Tìm kiếm bằng AI"
+                            >
+                                ✨
                             </button>
                         </form>
 
@@ -142,16 +156,25 @@ const Header = () => {
             {isMenuOpen && (
                 <div className="md:hidden bg-surface-dark border-t border-gray-800 absolute w-full">
                     <div className="px-4 pt-4 pb-6 space-y-4">
-                        <form onSubmit={handleSearch} className="relative mb-6">
-                            <input 
-                                type="text" 
-                                placeholder="Tìm kiếm..." 
-                                value={searchKeyword}
-                                onChange={(e) => setSearchKeyword(e.target.value)}
-                                className="w-full bg-gray-900 border border-gray-700 text-white rounded-md pl-4 pr-10 py-3 focus:outline-none focus:border-primary"
-                            />
-                            <button type="submit" className="absolute right-3 top-3 text-gray-400">
-                                <Search size={20} />
+                        <form onSubmit={(e) => handleSearch(e, false)} className="relative mb-6 flex items-center gap-2">
+                            <div className="relative flex-1">
+                                <input 
+                                    type="text" 
+                                    placeholder="Tìm kiếm..." 
+                                    value={searchKeyword}
+                                    onChange={(e) => setSearchKeyword(e.target.value)}
+                                    className="w-full bg-gray-900 border border-gray-700 text-white rounded-md pl-4 pr-10 py-3 focus:outline-none focus:border-primary"
+                                />
+                                <button type="submit" className="absolute right-3 top-3 text-gray-400">
+                                    <Search size={20} />
+                                </button>
+                            </div>
+                            <button 
+                                type="button"
+                                onClick={(e) => handleSearch(e, true)}
+                                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md font-bold transition-colors"
+                            >
+                                ✨ AI
                             </button>
                         </form>
 

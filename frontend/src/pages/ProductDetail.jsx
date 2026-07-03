@@ -17,6 +17,8 @@ const ProductDetail = () => {
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
     const [reviewMessage, setReviewMessage] = useState(null);
+    const [aiSummary, setAiSummary] = useState('');
+    const [loadingSummary, setLoadingSummary] = useState(false);
     const addToCart = useCartStore((state) => state.addToCart);
     const user = useUserStore((state) => state.user);
 
@@ -42,14 +44,32 @@ const ProductDetail = () => {
         const fetchRelated = async () => {
             if (!product?.category) return;
             try {
-                const { data } = await axiosClient.get(`/api/products?category=${product.category._id}`);
+                const { data } = await axiosClient.get(`/api/products?category=${product.category._id || product.category}`);
                 const relatedItems = data.filter((p) => p._id !== product._id).slice(0, 4);
                 setRelated(relatedItems);
             } catch (err) {
-                // ignore
+                console.error('Lỗi khi tải sản phẩm liên quan:', err);
             }
         };
         fetchRelated();
+    }, [product]);
+
+    useEffect(() => {
+        const fetchSummary = async () => {
+            if (product && product.reviews && product.reviews.length > 0 && !aiSummary) {
+                setLoadingSummary(true);
+                try {
+                    const reviewTexts = product.reviews.map(r => r.comment);
+                    const { data } = await axiosClient.post('/api/ai/summarize-reviews', { reviews: reviewTexts });
+                    setAiSummary(data.summary);
+                } catch (error) {
+                    console.error("AI Summary error:", error);
+                } finally {
+                    setLoadingSummary(false);
+                }
+            }
+        };
+        fetchSummary();
     }, [product]);
 
     const handleSubmitReview = async (e) => {
@@ -256,6 +276,24 @@ const ProductDetail = () => {
 
                     <div className="lg:col-span-2">
                         <div className="space-y-6">
+                            {/* AI Summary Block */}
+                            {(aiSummary || loadingSummary) && (
+                                <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5 mb-6 shadow-sm">
+                                    <div className="flex items-center gap-2 mb-2 text-purple-700">
+                                        <span className="text-xl">✨</span>
+                                        <h4 className="font-bold">AI Tóm tắt đánh giá</h4>
+                                    </div>
+                                    {loadingSummary ? (
+                                        <div className="flex items-center gap-2 text-purple-600/70 text-sm font-medium animate-pulse">
+                                            <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                                            Đang phân tích các đánh giá...
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-800 text-sm leading-relaxed">{aiSummary}</p>
+                                    )}
+                                </div>
+                            )}
+
                             {product.reviews && product.reviews.length > 0 ? (
                                 product.reviews.map((review) => (
                                     <div key={review._id || `${review.user}-${review.createdAt}`} className="border-b border-gray-100 pb-6 last:border-0">
