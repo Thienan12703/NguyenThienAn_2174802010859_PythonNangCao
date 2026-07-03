@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Tags, ShoppingCart, Users, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, Tags, ShoppingCart, Users, LogOut, Menu, X, FileText } from 'lucide-react';
 import { useState } from 'react';
 import useUserStore from '../stores/userStore';
 
@@ -14,6 +14,7 @@ const AdminLayout = ({ children }) => {
         { path: '/admin/categories', label: 'Danh mục', icon: <Tags size={20} /> },
         { path: '/admin/orders', label: 'Đơn hàng', icon: <ShoppingCart size={20} /> },
         { path: '/admin/users', label: 'Người dùng', icon: <Users size={20} /> },
+        { path: '/admin/posts', label: 'Bài viết', icon: <FileText size={20} /> },
     ];
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
