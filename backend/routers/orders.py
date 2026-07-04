@@ -36,8 +36,13 @@ async def add_order_items(order_in: OrderCreate, current_user: User = Depends(ge
     if not order_in.orderItems or len(order_in.orderItems) == 0:
         raise HTTPException(status_code=400, detail="No order items")
     
+    # Ensure order items store product as ObjectId, not string
+    for item in order_in.orderItems:
+        if isinstance(item.product, str):
+            item.product = ObjectId(item.product)
+
     order = Order(
-        user=current_user,
+        user=current_user.id,
         items=order_in.orderItems,
         shippingAddress=order_in.shippingAddress,
         paymentMethod=order_in.paymentMethod,

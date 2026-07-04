@@ -52,13 +52,19 @@ async def create_product_review(id: str, review_in: ReviewCreate, current_user: 
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    # Check if already reviewed
-    already_reviewed = any(str(r.user.id) == str(current_user.id) for r in product.reviews)
+    # Check if already reviewed (handle both old Mongoose ObjectId and new embedded formats)
+    already_reviewed = False
+    for r in product.reviews:
+        r_user_id = r.user.id if hasattr(r.user, "id") else (r.user.get("_id") if isinstance(r.user, dict) else str(r.user))
+        if str(r_user_id) == str(current_user.id):
+            already_reviewed = True
+            break
+            
     if already_reviewed:
         raise HTTPException(status_code=400, detail="Product already reviewed")
 
     review = Review(
-        user=current_user,
+        user=current_user.id,
         name=current_user.name,
         rating=review_in.rating,
         comment=review_in.comment
