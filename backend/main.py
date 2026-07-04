@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from core.database import init_db
-from routers import auth, products, orders, users, upload, ai, categories
+from routers import auth, products, orders, users, upload, ai, categories, posts
 from dotenv import load_dotenv
 import os
 
@@ -36,6 +36,7 @@ app.include_router(orders.router, prefix="/api/orders", tags=["Orders"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(upload.router, prefix="/api/upload", tags=["Upload"])
 app.include_router(categories.router, prefix="/api/categories", tags=["Categories"])
+app.include_router(posts.router, prefix="/api/posts", tags=["Posts"])
 app.include_router(ai.router, prefix="/api/ai", tags=["AI"])
 
 @app.get("/")
