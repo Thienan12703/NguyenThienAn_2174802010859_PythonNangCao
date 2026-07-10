@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmashPro - Đỉnh Cao Cầu Lông{% endblock %}</title>
+    <!-- Bootstrap CSS (Dark Theme - Cyborg) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --bs-primary: #39ff14;
+            --bs-primary-rgb: 57, 255, 20;
+            --bs-body-bg: #111;
+            --bs-body-color: #eee;
+        }
+        body {
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            font-family: 'Inter', sans-serif;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+        }
+        .text-neon {
+            color: var(--bs-primary) !important;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+        .btn-primary {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: #000;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: #32e612;
+            border-color: #32e612;
+            color: #000;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+        }
+        .card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-neon fw-bold fs-3" href="{{ url_for('main.index') }}">
+                <i class="bi bi-lightning-charge-fill"></i> SmashPro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="d-flex mx-auto w-50" action="{{ url_for('main.products') }}" method="GET">
+                    <div class="input-group">
+                        <input class="form-control bg-dark text-light border-secondary" type="search" name="keyword" placeholder="Tìm kiếm vợt, giày..." value="{{ request.args.get('keyword', '') }}">
+                        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                        <button class="btn btn-outline-primary" type="button" onclick="alert('Tính năng AI Smart Search sẽ được nâng cấp!')"><i class="bi bi-magic"></i> AI</button>
+                    </div>
+                </form>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.products') }}">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.posts') }}">Tin tức</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link position-relative" href="{{ url_for('main.cart') }}">
+                            <i class="bi bi-cart3 fs-5"></i>
+                            {% set cart = session.get('cart', {}) %}
+                            {% if cart %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ cart.values() | sum }}
+                            </span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-shield-lock"></i> Admin</a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                                <li><a class="dropdown-item" href="{{ url_for('main.my_orders') }}">Đơn hàng của tôi</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Đăng xuất</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="btn btn-primary rounded-pill px-4" href="{{ url_for('auth.login') }}">Đăng nhập</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4 mb-5 min-vh-100">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="bg-black py-5 border-top border-secondary">
+        <div class="container text-center text-muted">
+            <h4 class="text-neon mb-3"><i class="bi bi-lightning-charge-fill"></i> SmashPro</h4>
+            <p>Hệ thống bán lẻ dụng cụ cầu lông số 1 Việt Nam</p>
+            <p class="mb-0">&copy; 2026 SmashPro. Đồ án môn Python Nâng Cao.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

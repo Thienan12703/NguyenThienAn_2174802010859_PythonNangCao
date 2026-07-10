@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4 shadow border-secondary">
+            <h3 class="mb-4 text-neon">Thanh Toán</h3>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.fullname.label(class="form-label") }}
+                        {{ form.fullname(class="form-control bg-dark text-light border-secondary", value=current_user.username) }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.phone.label(class="form-label") }}
+                        {{ form.phone(class="form-control bg-dark text-light border-secondary") }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.address.label(class="form-label") }}
+                    {{ form.address(class="form-control bg-dark text-light border-secondary", rows="3") }}
+                </div>
+                <div class="mb-4">
+                    {{ form.payment_method.label(class="form-label") }}
+                    {{ form.payment_method(class="form-select bg-dark text-light border-secondary") }}
+                </div>
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-primary btn-lg") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

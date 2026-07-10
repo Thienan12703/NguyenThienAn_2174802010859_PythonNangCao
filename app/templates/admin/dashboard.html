@@ -1,0 +1,28 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<h2 class="mb-4">Tổng quan Hệ thống</h2>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card bg-dark border-primary text-center p-4">
+            <i class="bi bi-box-seam text-primary mb-2" style="font-size: 2.5rem;"></i>
+            <h5 class="text-muted">Tổng Sản phẩm</h5>
+            <h2 class="text-neon">{{ total_products }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark border-warning text-center p-4">
+            <i class="bi bi-cart-check text-warning mb-2" style="font-size: 2.5rem;"></i>
+            <h5 class="text-muted">Tổng Đơn hàng</h5>
+            <h2 class="text-warning">{{ total_orders }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark border-info text-center p-4">
+            <i class="bi bi-people text-info mb-2" style="font-size: 2.5rem;"></i>
+            <h5 class="text-muted">Khách hàng</h5>
+            <h2 class="text-info">{{ total_users }}</h2>
+        </div>
+    </div>
+</div>
+{% endblock %}

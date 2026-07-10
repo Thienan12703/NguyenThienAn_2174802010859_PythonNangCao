@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="p-5 mb-4 rounded-3 text-center" style="background: linear-gradient(135deg, #111, #222); border: 2px solid var(--bs-primary);">
+    <div class="container-fluid py-5">
+        <h1 class="display-4 fw-bold text-neon mb-3">Vươn Tầm Đam Mê Cùng SmashPro</h1>
+        <p class="col-md-8 mx-auto fs-5 text-muted mb-4">Khám phá bộ sưu tập vợt, giày và phụ kiện cầu lông đỉnh cao từ các thương hiệu hàng đầu thế giới.</p>
+        <a href="{{ url_for('main.products') }}" class="btn btn-primary btn-lg rounded-pill px-5 shadow-lg">Mua Sắm Ngay <i class="bi bi-arrow-right"></i></a>
+    </div>
+</div>
+
+<!-- AI Feature Highlight -->
+<div class="row align-items-center mb-5 mt-5">
+    <div class="col-md-6">
+        <img src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="img-fluid rounded shadow-lg" alt="AI Features" style="border: 1px solid #333;">
+    </div>
+    <div class="col-md-6 mt-4 mt-md-0">
+        <h2 class="fw-bold mb-3">Trải Nghiệm Mua Sắm Thông Minh <span class="badge bg-primary text-dark ms-2">BETA</span></h2>
+        <p class="text-muted fs-5 mb-4">SmashPro là hệ thống đầu tiên tích hợp AI (Gemini) để nâng tầm trải nghiệm của bạn.</p>
+        <ul class="list-unstyled fs-5">
+            <li class="mb-3"><i class="bi bi-check-circle-fill text-neon me-2"></i> <strong>Smart Search:</strong> Tìm kiếm bằng ngôn ngữ tự nhiên.</li>
+            <li class="mb-3"><i class="bi bi-check-circle-fill text-neon me-2"></i> <strong>AI Summary:</strong> Tóm tắt hàng ngàn đánh giá trong 1 giây.</li>
+            <li class="mb-3"><i class="bi bi-check-circle-fill text-neon me-2"></i> <strong>Auto Content:</strong> Mô tả sản phẩm chuẩn SEO tự động.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Featured Products -->
+<div class="mt-5">
+    <h3 class="mb-4 text-neon border-bottom border-secondary pb-2">Sản phẩm nổi bật</h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for p in products %}
+        <div class="col">
+            <div class="card h-100 p-2">
+                <img src="{{ p.image or 'https://via.placeholder.com/400' }}" class="card-img-top rounded" alt="{{ p.name }}" style="height: 250px; object-fit: cover;">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-light">{{ p.name }}</h5>
+                    <p class="card-text text-muted small">{{ p.brand }}</p>
+                    <h6 class="text-neon mb-3 fs-5">{{ "{:,.0f}".format(p.price) }} VNĐ</h6>
+                    <div class="mt-auto d-flex gap-2">
+                        <a href="{{ url_for('main.product', id=p.id) }}" class="btn btn-outline-light w-100">Chi tiết</a>
+                        <form action="{{ url_for('main.add_to_cart', id=p.id) }}" method="POST" class="w-100">
+                            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-cart-plus"></i> Mua</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-muted">
+            <p>Chưa có sản phẩm nào.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

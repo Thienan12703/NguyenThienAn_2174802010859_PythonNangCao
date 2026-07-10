@@ -1,0 +1,63 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<h2 class="mb-4">Quản lý Đơn hàng</h2>
+
+<div class="card bg-dark border-secondary">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Mã Đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Thanh toán</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td>#{{ o.id }}</td>
+                    <td>
+                        {{ o.customer.username }}<br>
+                        <small class="text-muted">{{ o.customer.email }}</small>
+                    </td>
+                    <td>{{ o.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td class="text-neon">{{ "{:,.0f}".format(o.total_price) }} đ</td>
+                    <td>{{ o.payment_method }}</td>
+                    <td>
+                        {% if o.status == 'Pending' %}
+                        <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                        {% else %}
+                        <span class="badge bg-success">Hoàn thành</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">Chưa có đơn hàng nào.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if pagination.pages > 1 %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center" data-bs-theme="dark">
+        {% for p in pagination.iter_pages() %}
+            {% if p %}
+                <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                    <a class="page-link {% if p == pagination.page %}bg-primary text-dark border-primary{% else %}bg-dark text-light border-secondary{% endif %}" href="{{ url_for('admin.orders', page=p) }}">{{ p }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link bg-dark border-secondary">...</span></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

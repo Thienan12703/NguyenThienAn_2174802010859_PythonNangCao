@@ -1,0 +1,92 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="card bg-dark border-secondary">
+    <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">{{ title }}</h4>
+        <a href="{{ url_for('admin.products') }}" class="btn btn-sm btn-outline-secondary">Quay lại</a>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-control bg-dark text-light border-secondary") }}
+                    <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="generateDescAI()"><i class="bi bi-robot"></i> Tạo mô tả tự động (AI)</button>
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.brand.label(class="form-label") }}
+                    {{ form.brand(class="form-control bg-dark text-light border-secondary") }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    {{ form.price.label(class="form-label") }}
+                    {{ form.price(class="form-control bg-dark text-light border-secondary") }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form.stock.label(class="form-label") }}
+                    {{ form.stock(class="form-control bg-dark text-light border-secondary") }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form.category_id.label(class="form-label") }}
+                    {{ form.category_id(class="form-select bg-dark text-light border-secondary") }}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                {{ form.image.label(class="form-label") }}
+                {{ form.image(class="form-control bg-dark text-light border-secondary") }}
+            </div>
+            
+            <div class="mb-4">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control bg-dark text-light border-secondary", rows="5", id="desc-field") }}
+            </div>
+            
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function generateDescAI() {
+        const name = document.getElementById('name').value;
+        const brand = document.getElementById('brand').value;
+        
+        if (!name || !brand) {
+            alert('Vui lòng nhập Tên sản phẩm và Thương hiệu trước khi dùng AI!');
+            return;
+        }
+        
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang tạo...';
+        btn.disabled = true;
+        
+        try {
+            const response = await fetch('/ai/generate-description', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, brand })
+            });
+            const data = await response.json();
+            if(data.description) {
+                document.getElementById('desc-field').value = data.description;
+            } else {
+                alert('Lỗi AI: ' + data.error);
+            }
+        } catch(err) {
+            alert('Lỗi kết nối tới AI!');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}
