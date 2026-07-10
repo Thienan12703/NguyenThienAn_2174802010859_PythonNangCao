@@ -9,20 +9,17 @@
         </a>
     </div>
 
-    <form method="POST" action="">
+    <form method="POST" action="" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
                 {{ form.name.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
                 {{ form.name(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", id="name") }}
-                <button type="button" class="mt-2 text-xs text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1 bg-purple-900/20 px-3 py-1.5 rounded-lg border border-purple-800 transition-colors" onclick="generateDescAI()">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo mô tả tự động (AI)
-                </button>
             </div>
             <div>
-                {{ form.brand.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
-                {{ form.brand(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", id="brand") }}
+                {{ form.brand_id.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                {{ form.brand_id(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", id="brand") }}
             </div>
         </div>
         
@@ -42,12 +39,18 @@
         </div>
         
         <div class="mb-6">
-            {{ form.image.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
-            {{ form.image(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", placeholder="URL hình ảnh (VD: https://...)") }}
+            {{ form.images.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+            {{ form.images(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary") }}
+            <p class="text-xs text-gray-500 mt-2">Lưu ý: Nếu tải lên ảnh mới, các ảnh cũ sẽ bị ghi đè. Bạn có thể chọn nhiều file cùng lúc.</p>
         </div>
         
         <div class="mb-8">
-            {{ form.description.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+            <div class="flex items-center justify-between mb-2">
+                {{ form.description.label(class="block text-sm font-semibold text-gray-300") }}
+                <button type="button" class="text-xs text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1 bg-purple-900/20 px-3 py-1.5 rounded-lg border border-purple-800 transition-colors" onclick="generateDescAI()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo mô tả tự động (AI)
+                </button>
+            </div>
             {{ form.description(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", rows="6", id="desc-field") }}
         </div>
         
@@ -62,10 +65,11 @@
 <script>
     async function generateDescAI() {
         const name = document.getElementById('name').value;
-        const brand = document.getElementById('brand').value;
+        const brandSelect = document.getElementById('brand');
+        const brand = brandSelect.options[brandSelect.selectedIndex].text;
         
         if (!name || !brand) {
-            alert('Vui lòng nhập Tên sản phẩm và Thương hiệu trước khi dùng AI!');
+            alert('Vui lòng nhập Tên sản phẩm và chọn Thương hiệu trước khi dùng AI!');
             return;
         }
         

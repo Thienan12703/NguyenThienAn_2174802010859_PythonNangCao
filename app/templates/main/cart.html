@@ -11,31 +11,40 @@
             <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
                 <!-- Header -->
                 <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-800 bg-black/50 text-sm font-bold text-gray-400 uppercase tracking-wider">
-                    <div class="col-span-6">Sản phẩm</div>
-                    <div class="col-span-3 text-center">Đơn giá</div>
-                    <div class="col-span-3 text-right">Tổng</div>
+                    <div class="col-span-5 sm:col-span-6">Sản phẩm</div>
+                    <div class="col-span-3 text-center hidden sm:block">Đơn giá</div>
+                    <div class="col-span-4 sm:col-span-2 text-right">Tổng</div>
+                    <div class="col-span-3 sm:col-span-1 text-right"></div>
                 </div>
 
                 <!-- Items -->
                 <div class="divide-y divide-gray-800">
                     {% for item in cart_items %}
-                    <div class="grid grid-cols-12 gap-4 p-4 items-center group">
-                        <div class="col-span-6 flex items-center gap-4">
-                            <a href="{{ url_for('main.product', id=item.product.id) }}" class="w-20 h-20 bg-white rounded-xl overflow-hidden shrink-0 border border-gray-100 p-2 block">
+                    <div class="grid grid-cols-12 gap-4 p-4 items-center group relative">
+                        <div class="col-span-8 sm:col-span-6 flex items-center gap-4">
+                            <a href="{{ url_for('main.product', id=item.product.id) }}" class="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-xl overflow-hidden shrink-0 border border-gray-100 p-2 block">
                                 <img src="{{ item.product.image or 'https://via.placeholder.com/100' }}" alt="{{ item.product.name }}" class="w-full h-full object-contain mix-blend-multiply" />
                             </a>
                             <div class="min-w-0">
-                                <a href="{{ url_for('main.product', id=item.product.id) }}" class="font-bold text-gray-200 hover:text-primary transition-colors line-clamp-2">{{ item.product.name }}</a>
-                                <p class="text-sm text-gray-500 mt-1">SL: {{ item.quantity }}</p>
+                                <a href="{{ url_for('main.product', id=item.product.id) }}" class="font-bold text-gray-200 hover:text-primary transition-colors line-clamp-2 text-sm sm:text-base">{{ item.product.name }}</a>
+                                <p class="text-xs sm:text-sm text-gray-500 mt-1">SL: {{ item.quantity }}</p>
                             </div>
                         </div>
                         
-                        <div class="col-span-3 text-center font-medium text-gray-400">
+                        <div class="col-span-3 text-center font-medium text-gray-400 hidden sm:block">
                             {{ "{:,.0f}".format(item.product.price) }}đ
                         </div>
 
-                        <div class="col-span-3 text-right font-black text-primary">
+                        <div class="col-span-4 sm:col-span-2 text-right font-black text-primary">
                             {{ "{:,.0f}".format(item.product.price * item.quantity) }}đ
+                        </div>
+                        
+                        <div class="col-span-12 sm:col-span-1 text-right sm:text-center mt-2 sm:mt-0 absolute right-4 top-4 sm:static">
+                            <form action="{{ url_for('main.remove_from_cart', id=item.product.id) }}" method="POST" class="inline">
+                                <button type="submit" class="text-gray-600 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-500/10" title="Xóa">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                     {% endfor %}

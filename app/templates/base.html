@@ -47,30 +47,46 @@
                 </div>
 
                 <!-- Desktop Menu -->
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="{{ url_for('main.index') }}" class="text-gray-300 hover:text-primary font-medium transition-colors">Trang Chủ</a>
-                    <a href="{{ url_for('main.products') }}" class="text-gray-300 hover:text-primary font-medium transition-colors">Tất cả Sản phẩm</a>
-                    <a href="{{ url_for('main.posts') }}" class="text-gray-300 hover:text-primary font-medium transition-colors">Tin tức</a>
-                    <a href="#" class="text-gray-300 hover:text-primary font-medium transition-colors">Liên hệ</a>
+                <nav class="hidden md:flex items-center justify-center flex-1 space-x-6 lg:space-x-12 mx-4">
+                    <a href="{{ url_for('main.index') }}" class="text-gray-300 hover:text-primary font-medium transition-colors whitespace-nowrap">Trang Chủ</a>
+                    
+                    <div class="relative group">
+                        <a href="{{ url_for('main.products') }}" class="text-gray-300 hover:text-primary font-medium transition-colors inline-flex items-center whitespace-nowrap">
+                            Sản phẩm <i class="fa-solid fa-chevron-down ml-2 text-xs"></i>
+                        </a>
+                        <div class="absolute left-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                            <div class="py-2 overflow-hidden rounded-xl">
+                                <a href="{{ url_for('main.products') }}" class="block px-4 py-2 text-gray-300 hover:text-primary hover:bg-black transition-colors">Tất cả Sản phẩm</a>
+                                <a href="{{ url_for('main.products', keyword='Vợt') }}" class="block px-4 py-2 text-gray-300 hover:text-primary hover:bg-black transition-colors">Vợt cầu lông</a>
+                                <a href="{{ url_for('main.products', keyword='Giày') }}" class="block px-4 py-2 text-gray-300 hover:text-primary hover:bg-black transition-colors">Giày cầu lông</a>
+                                <a href="{{ url_for('main.products', keyword='Balo') }}" class="block px-4 py-2 text-gray-300 hover:text-primary hover:bg-black transition-colors">Balo / Túi</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('main.posts') }}" class="text-gray-300 hover:text-primary font-medium transition-colors whitespace-nowrap">Tin tức</a>
+                    <a href="{{ url_for('main.contact') }}" class="text-gray-300 hover:text-primary font-medium transition-colors whitespace-nowrap">Liên hệ</a>
+                    <a href="{{ url_for('main.track') }}" class="text-gray-300 hover:text-primary font-medium transition-colors whitespace-nowrap">Tra cứu</a>
                 </nav>
 
                 <!-- Search Bar -->
                 <div class="hidden lg:flex flex-1 max-w-md mx-8">
-                    <form action="{{ url_for('main.products') }}" method="GET" class="w-full flex items-center">
-                        <div class="relative w-full">
+                    <form action="{{ url_for('main.products') }}" method="GET" class="w-full flex items-center h-10">
+                        <div class="relative w-full h-full">
                             <input 
                                 type="text" 
                                 name="keyword" 
                                 value="{{ request.args.get('keyword', '') }}"
                                 placeholder="Tìm kiếm vợt, giày..." 
-                                class="w-full bg-gray-900 text-white border border-gray-700 rounded-l-md py-2 pl-4 pr-10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                class="w-full h-full bg-gray-900 text-white border border-gray-700 rounded-l-md py-2 pl-4 pr-10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"
                             />
                             <button type="submit" class="absolute right-0 top-0 bottom-0 px-3 text-gray-400 hover:text-primary">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </button>
                         </div>
-                        <button type="button" onclick="alert('Tính năng AI Search đang nâng cấp')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-r-md font-bold transition-colors border border-purple-600">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI
+                        <button type="button" title="AI Search" onclick="performAISearch()" class="w-10 h-10 shrink-0 flex items-center justify-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-r-md transition-all border-y border-r border-purple-500/50 shadow-[0_0_10px_rgba(147,51,234,0.3)] group relative overflow-hidden">
+                            <div class="absolute inset-0 bg-white/20 group-hover:translate-x-full -translate-x-full transition-transform duration-500 skew-x-12"></div>
+                            <i class="fa-solid fa-wand-magic-sparkles animate-pulse drop-shadow-md relative"></i>
                         </button>
                     </form>
                 </div>
@@ -139,55 +155,205 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-surface-dark text-gray-300 border-t border-gray-800 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Brand -->
-                <div class="space-y-4">
-                    <h3 class="text-2xl font-black text-white italic tracking-wider">
+    <footer class="bg-surface-dark border-t border-gray-800 mt-20 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-1">
+                    <a href="{{ url_for('main.index') }}" class="text-3xl font-black italic tracking-wider mb-6 block">
                         SMASH<span class="text-primary">PRO</span>
-                    </h3>
-                    <p class="text-sm text-gray-400">
-                        Cửa hàng cầu lông chuyên nghiệp. Nơi cung cấp dụng cụ thể thao đỉnh cao cho đam mê của bạn.
-                    </p>
+                    </a>
+                    <p class="text-gray-400 mb-6 text-sm">Hệ thống phân phối dụng cụ cầu lông chính hãng hàng đầu Việt Nam. Nâng tầm đam mê của bạn.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-black transition-colors"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-black transition-colors"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-black transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
                 </div>
-                <!-- Quick Links -->
+                
                 <div>
-                    <h4 class="text-white font-bold mb-4 uppercase tracking-wide">Sản phẩm</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="{{ url_for('main.products', category_id=1) }}" class="hover:text-primary transition-colors">Vợt Cầu Lông</a></li>
-                        <li><a href="{{ url_for('main.products', category_id=2) }}" class="hover:text-primary transition-colors">Giày Cầu Lông</a></li>
-                        <li><a href="{{ url_for('main.products', category_id=3) }}" class="hover:text-primary transition-colors">Quần áo</a></li>
-                        <li><a href="{{ url_for('main.products', category_id=4) }}" class="hover:text-primary transition-colors">Túi / Balo</a></li>
+                    <h3 class="font-bold text-white mb-6 uppercase tracking-wider text-sm">Về Chúng Tôi</h3>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-primary transition-colors">Giới thiệu</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Liên hệ</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Hệ thống cửa hàng</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Tin tức cầu lông</a></li>
                     </ul>
                 </div>
-                <!-- Support -->
+                
                 <div>
-                    <h4 class="text-white font-bold mb-4 uppercase tracking-wide">Hỗ trợ</h4>
-                    <ul class="space-y-2 text-sm">
+                    <h3 class="font-bold text-white mb-6 uppercase tracking-wider text-sm">Chính Sách</h3>
+                    <ul class="space-y-3 text-sm text-gray-400">
                         <li><a href="#" class="hover:text-primary transition-colors">Chính sách bảo hành</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">Chính sách đổi trả</a></li>
-                        <li><a href="#" class="hover:text-primary transition-colors">Giao hàng & Thanh toán</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Chính sách giao hàng</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Bảo mật thông tin</a></li>
                     </ul>
                 </div>
-                <!-- Contact -->
+                
                 <div>
-                    <h4 class="text-white font-bold mb-4 uppercase tracking-wide">Liên hệ</h4>
-                    <ul class="space-y-3 text-sm">
-                        <li class="flex items-start space-x-3">
-                            <i class="fa-solid fa-location-dot text-primary mt-1"></i>
-                            <span>123 Đường Cầu Lông, Quận Thể Thao, TP. HCM</span>
+                    <h3 class="font-bold text-white mb-6 uppercase tracking-wider text-sm">Liên Hệ</h3>
+                    <ul class="space-y-4 text-sm text-gray-400">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot mt-1 text-primary"></i>
+                            <span>123 Đường Cầu Lông, Quận 1, TP.HCM</span>
                         </li>
-                        <li class="flex items-center space-x-3">
+                        <li class="flex items-center gap-3">
                             <i class="fa-solid fa-phone text-primary"></i>
-                            <span>0123 456 789</span>
+                            <span>1900 1234 (Miễn phí)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-envelope text-primary"></i>
+                            <span>support@smashpro.vn</span>
                         </li>
                     </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-sm text-gray-500 mb-4 md:mb-0">© 2026 SmashPro. All rights reserved.</p>
+                <div class="flex space-x-4">
+                    <i class="fa-brands fa-cc-visa text-3xl text-gray-600 hover:text-white transition-colors"></i>
+                    <i class="fa-brands fa-cc-mastercard text-3xl text-gray-600 hover:text-white transition-colors"></i>
+                    <i class="fa-brands fa-cc-paypal text-3xl text-gray-600 hover:text-white transition-colors"></i>
                 </div>
             </div>
         </div>
     </footer>
 
     {% block scripts %}{% endblock %}
+
+    <script>
+        // Hiệu ứng quả cầu rơi 2 bên (Global)
+        function createShuttlecocks() {
+            if (document.getElementById('shuttlecock-container')) return;
+            
+            // Add CSS for animation and styling
+            if (!document.getElementById('shuttlecock-style')) {
+                const style = document.createElement('style');
+                style.id = 'shuttlecock-style';
+                style.textContent = `
+                    .shuttlecock-item {
+                        position: absolute;
+                        color: rgba(255, 255, 255, 0.4);
+                        filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.5));
+                        z-index: 9999;
+                    }
+                    @keyframes fall {
+                        0% { transform: translateY(-50px) rotate(0deg) scale(1); opacity: 0; }
+                        10% { opacity: 1; }
+                        90% { opacity: 1; }
+                        100% { transform: translateY(110vh) rotate(360deg) scale(0.5); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            const container = document.createElement('div');
+            container.id = 'shuttlecock-container';
+            container.style.position = 'fixed';
+            container.style.top = '0';
+            container.style.left = '0';
+            container.style.width = '100vw';
+            container.style.height = '100vh';
+            container.style.pointerEvents = 'none';
+            container.style.zIndex = '9998';
+            container.style.overflow = 'hidden';
+            document.body.appendChild(container);
+
+            const total = 40;
+            for (let i = 0; i < total; i++) {
+                const s = document.createElement('div');
+                s.className = 'shuttlecock-item';
+                s.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 90" style="width:100%;height:100%;filter:drop-shadow(0 0 6px rgba(255,255,255,0.3))">
+  <!-- Cork base -->
+  <ellipse cx="30" cy="80" rx="9" ry="6" fill="#e8c97a"/>
+  <ellipse cx="30" cy="77" rx="9" ry="5" fill="#f5dfa0"/>
+  <rect x="21" y="70" width="18" height="10" rx="3" fill="#f5dfa0"/>
+  <ellipse cx="30" cy="70" rx="9" ry="5" fill="#fff8e8"/>
+  <!-- Black band -->
+  <rect x="21" y="66" width="18" height="5" rx="2" fill="#222"/>
+  <!-- Feather shafts -->
+  <line x1="30" y1="66" x2="12" y2="10" stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+  <line x1="30" y1="66" x2="18" y2="6"  stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+  <line x1="30" y1="66" x2="25" y2="3"  stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+  <line x1="30" y1="66" x2="30" y2="2"  stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+  <line x1="30" y1="66" x2="35" y2="3"  stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+  <line x1="30" y1="66" x2="42" y2="6"  stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+  <line x1="30" y1="66" x2="48" y2="10" stroke="rgba(255,255,255,0.7)" stroke-width="0.8"/>
+  <!-- Feather vanes (left side) -->
+  <path d="M30,66 Q18,40 12,10 Q16,8 20,14 Q24,40 30,66Z" fill="rgba(255,255,255,0.85)"/>
+  <path d="M30,66 Q22,38 18,6 Q22,5 24,9 Q27,37 30,66Z" fill="rgba(255,255,255,0.85)"/>
+  <path d="M30,66 Q27,35 25,3 Q29,3 29,6 Q30,35 30,66Z" fill="rgba(255,255,255,0.85)"/>
+  <!-- Feather vanes (right side) -->
+  <path d="M30,66 Q31,35 30,2 Q33,3 33,6 Q32,35 30,66Z" fill="rgba(255,255,255,0.85)"/>
+  <path d="M30,66 Q36,37 42,6 Q44,9 40,14 Q36,40 30,66Z" fill="rgba(255,255,255,0.85)"/>
+  <path d="M30,66 Q40,40 48,10 Q52,14 46,18 Q38,42 30,66Z" fill="rgba(255,255,255,0.85)"/>
+  <!-- Feather rim connecting tips -->
+  <path d="M12,10 Q18,4 25,3 Q30,2 35,3 Q42,4 48,10" stroke="rgba(255,255,255,0.6)" stroke-width="1" fill="none"/>
+</svg>`;
+                
+                const size = Math.random() * 30 + 20;
+                
+                let left;
+                if (Math.random() > 0.5) {
+                    left = Math.random() * 15;
+                } else {
+                    left = 85 + Math.random() * 15;
+                }
+
+                const duration = Math.random() * 15 + 10;
+                const delay = Math.random() * 15;
+                const rotate = Math.random() * 360;
+                
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
+                s.style.left = left + 'vw';
+                s.style.top = '-50px';
+                s.style.transform = 'rotate(' + rotate + 'deg)';
+                s.style.animation = 'fall ' + duration + 's linear ' + delay + 's infinite';
+                
+                container.appendChild(s);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', createShuttlecocks);
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            createShuttlecocks();
+        }
+
+        async function performAISearch() {
+            const query = document.querySelector('input[name="keyword"]').value;
+            if (!query) {
+                alert('Vui lòng nhập nội dung tìm kiếm trước khi dùng AI!');
+                return;
+            }
+            
+            // Show loading state
+            const btn = document.querySelector('button[title="AI Search"]');
+            const icon = btn.querySelector('i');
+            const originalClass = icon.className;
+            icon.className = 'fa-solid fa-spinner fa-spin';
+            
+            try {
+                const response = await fetch('/ai/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert('Lỗi AI: ' + data.error);
+                } else if (data.ai_ids) {
+                    window.location.href = '/products?ai_ids=' + data.ai_ids;
+                } else {
+                    alert('AI không tìm thấy sản phẩm nào phù hợp với yêu cầu của bạn.');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối tới server AI!');
+            } finally {
+                icon.className = originalClass;
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,35 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 sm:p-8">
+    <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
+        <h2 class="text-2xl font-black uppercase text-white">{{ title }}</h2>
+        <a href="{{ url_for('admin.posts') }}" class="text-gray-400 hover:text-white transition-colors">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Quay lại
+        </a>
+    </div>
+
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        
+        <div class="mb-6">
+            {{ form.title.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+            {{ form.title(class="w-full bg-black border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-primary") }}
+        </div>
+
+        <div class="mb-6">
+            {{ form.thumbnail.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+            {{ form.thumbnail(class="w-full bg-black border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-primary", accept="image/*") }}
+        </div>
+
+        <div class="mb-6">
+            {{ form.content.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+            {{ form.content(class="w-full bg-black border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-primary", rows="10") }}
+        </div>
+        
+        <div class="flex justify-end pt-4 border-t border-gray-800">
+            {{ form.submit(class="bg-primary hover:bg-primary-dark text-black font-bold py-3 px-8 rounded-lg cursor-pointer transition-colors shadow-[0_0_15px_rgba(57,255,20,0.3)]") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

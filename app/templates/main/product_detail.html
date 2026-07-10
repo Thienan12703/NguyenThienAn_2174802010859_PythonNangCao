@@ -11,19 +11,28 @@
         <span class="text-gray-100 truncate max-w-xs">{{ product.name }}</span>
     </nav>
 
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
         <!-- Images -->
         <div class="md:col-span-7 flex flex-col-reverse sm:flex-row gap-4">
             <div class="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-visible sm:w-24 shrink-0 scrollbar-hide">
-                <button class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 border-primary ring-2 ring-primary/30 transition-all">
-                    <img src="{{ product.image or 'https://via.placeholder.com/400' }}" alt="{{ product.name }}" class="w-full h-full object-cover mix-blend-multiply bg-gray-50" />
-                </button>
+                {% if product.images %}
+                    {% for img in product.images %}
+                    <button class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 bg-white {% if loop.first %}border-primary ring-2 ring-primary/30{% else %}border-gray-800 hover:border-gray-600{% endif %} transition-all thumb-btn" onclick="document.getElementById('mainImage').src='{{ img }}'; document.querySelectorAll('.thumb-btn').forEach(b => {b.classList.remove('border-primary', 'ring-2', 'ring-primary/30'); b.classList.add('border-gray-800')}); this.classList.remove('border-gray-800'); this.classList.add('border-primary', 'ring-2', 'ring-primary/30');">
+                        <img src="{{ img }}" alt="{{ product.name }}" class="w-full h-full object-cover" />
+                    </button>
+                    {% endfor %}
+                {% else %}
+                    <button class="thumb-btn w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 border-primary ring-2 ring-primary/30 transition-all bg-white">
+                        <img src="https://via.placeholder.com/400" alt="{{ product.name }}" class="w-full h-full object-cover" />
+                    </button>
+                {% endif %}
             </div>
             <div class="flex-1 bg-white rounded-2xl overflow-hidden relative group border border-gray-100">
                 <img 
+                    id="mainImage"
                     src="{{ product.image or 'https://via.placeholder.com/400' }}" 
                     alt="{{ product.name }}" 
-                    class="w-full h-full object-contain cursor-zoom-in group-hover:scale-105 transition-transform duration-500 min-h-[400px] max-h-[600px] p-4" 
+                    class="w-full h-full object-cover cursor-zoom-in group-hover:scale-105 transition-transform duration-500 min-h-[400px] max-h-[600px]" 
                 />
                 <span class="absolute top-4 left-4 bg-black text-primary text-xs font-black px-3 py-1.5 uppercase tracking-wider rounded-md border border-primary/30">HOT</span>
             </div>
@@ -32,7 +41,7 @@
         <!-- Product Info -->
         <div class="md:col-span-5 flex flex-col">
             <div class="mb-2">
-                <span class="text-sm font-black text-gray-400 uppercase tracking-widest">{{ product.brand }}</span>
+                <span class="text-sm font-black text-gray-400 uppercase tracking-widest">{{ product.brand.name if product.brand else 'No Brand' }}</span>
             </div>
             <h1 class="text-3xl md:text-4xl font-black text-white leading-tight mb-4">{{ product.name }}</h1>
             
@@ -56,7 +65,7 @@
             </p>
 
             <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 mb-8">
-                <form action="{{ url_for('main.add_to_cart', id=product.id) }}" method="POST">
+                <form action="{{ url_for('main.add_to_cart', id=product.id) }}" method="POST" id="cartForm">
                     <div class="flex items-center gap-4 mb-6">
                         <span class="font-bold text-gray-300">Số lượng:</span>
                         <div class="flex items-center bg-black border border-gray-700 rounded-lg overflow-hidden">
@@ -75,14 +84,29 @@
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        class="w-full py-4 rounded-xl font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-all {% if product.stock == 0 %}bg-gray-700 text-gray-500 cursor-not-allowed{% else %}bg-primary text-black hover:bg-primary-dark shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)]{% endif %}"
-                        {% if product.stock == 0 %}disabled{% endif %}
-                    >
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        {% if product.stock == 0 %}Tạm Hết Hàng{% else %}Thêm Vào Giỏ{% endif %}
-                    </button>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button
+                            type="submit"
+                            name="action"
+                            value="add"
+                            class="flex-1 py-4 rounded-xl font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-all {% if product.stock == 0 %}bg-gray-700 text-gray-500 cursor-not-allowed{% else %}bg-transparent border-2 border-primary text-primary hover:bg-primary/10{% endif %}"
+                            {% if product.stock == 0 %}disabled{% endif %}
+                        >
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            Thêm Vào Giỏ
+                        </button>
+                        
+                        <button
+                            type="submit"
+                            name="action"
+                            value="buy_now"
+                            class="flex-1 py-4 rounded-xl font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-all {% if product.stock == 0 %}bg-gray-700 text-gray-500 cursor-not-allowed{% else %}bg-primary text-black hover:bg-primary-dark shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)]{% endif %}"
+                            {% if product.stock == 0 %}disabled{% endif %}
+                        >
+                            <i class="fa-solid fa-bolt"></i>
+                            {% if product.stock == 0 %}Hết Hàng{% else %}Mua Ngay{% endif %}
+                        </button>
+                    </div>
                 </form>
             </div>
 

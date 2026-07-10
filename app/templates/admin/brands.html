@@ -1,0 +1,45 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <h2 class="text-2xl font-black uppercase text-white">Quản Lý Thương Hiệu</h2>
+    <a href="{{ url_for('admin.new_brand') }}" class="bg-primary hover:bg-primary-dark text-black px-6 py-2 rounded-lg font-bold transition-colors shadow-[0_0_15px_rgba(57,255,20,0.3)]">
+        <i class="fa-solid fa-plus mr-2"></i> Thêm Mới
+    </a>
+</div>
+
+<div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-gray-300">
+            <thead class="bg-black/50 border-b border-gray-800 text-gray-400 uppercase text-xs font-bold tracking-wider">
+                <tr>
+                    <th class="p-4">ID</th>
+                    <th class="p-4">Tên Thương Hiệu</th>
+                    <th class="p-4">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800 text-sm">
+                {% for b in brands %}
+                <tr class="hover:bg-gray-800/50 transition-colors">
+                    <td class="p-4 font-bold text-gray-400">#{{ b.id }}</td>
+                    <td class="p-4 font-bold text-white">{{ b.name }}</td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            <form action="{{ url_for('admin.delete_brand', id=b.id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa thương hiệu này?');">
+                                <button type="submit" class="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded text-xs font-bold transition-colors border border-red-500/30">Xóa</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="p-8 text-center text-gray-500">
+                        Chưa có thương hiệu nào.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

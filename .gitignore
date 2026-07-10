@@ -1,13 +1,10 @@
 # Node dependencies
 node_modules/
 
-# Environment files
+# Environment files - NEVER commit these
 .env
 backend/.env
 frontend/.env
-
-# Uploads
-backend/uploads/
 
 # Logs
 npm-debug.log*
@@ -18,14 +15,29 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Vite
+# Vite/React build
 dist/
 
 # Python
 __pycache__/
 *.py[cod]
 *.class
+*.pyc
+
+# Virtual environments
+venv/
 backend/venv/
 backend/venv_old/
-backend_old/node_modules/
+env/
+.venv/
 
+# SQLite database (do NOT commit, will be created fresh on server)
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# Old code
+archive_fastapi_react/

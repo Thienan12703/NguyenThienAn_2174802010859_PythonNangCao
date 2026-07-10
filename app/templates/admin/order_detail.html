@@ -1,0 +1,67 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="flex justify-between items-center mb-8">
+    <h2 class="text-2xl font-black uppercase text-white">Chi Tiết Đơn Hàng #{{ order.id }}</h2>
+    <a href="{{ url_for('admin.orders') }}" class="text-gray-400 hover:text-white transition-colors">
+        <i class="fa-solid fa-arrow-left mr-2"></i> Quay lại
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-2 space-y-8">
+        <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6">
+            <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Danh sách sản phẩm</h3>
+            <div class="space-y-4">
+                {% for item in order.items %}
+                <div class="flex items-center gap-4">
+                    <img src="{{ item.product.image or 'https://via.placeholder.com/100' }}" class="w-16 h-16 object-contain bg-white rounded-lg p-1" alt="{{ item.product.name }}">
+                    <div class="flex-1">
+                        <a href="{{ url_for('main.product', id=item.product.id) }}" class="font-bold text-gray-200 hover:text-primary transition-colors block line-clamp-1">{{ item.product.name }}</a>
+                        <div class="text-sm text-gray-500 mt-1">Số lượng: {{ item.quantity }} x <span class="font-bold text-white">{{ "{:,.0f}".format(item.price) }}đ</span></div>
+                    </div>
+                    <div class="font-black text-primary">{{ "{:,.0f}".format(item.price * item.quantity) }}đ</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-800 flex justify-between items-center">
+                <span class="text-lg text-gray-400 font-bold">Tổng thanh toán:</span>
+                <span class="text-2xl font-black text-primary">{{ "{:,.0f}".format(order.total_price) }}đ</span>
+            </div>
+        </div>
+
+        <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6">
+            <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Thông tin giao hàng</h3>
+            <p class="text-gray-300"><strong>Mã vận đơn:</strong> <span class="text-primary font-mono">{{ order.tracking_code }}</span></p>
+            <p class="text-gray-300 mt-2"><strong>Người nhận:</strong> {{ order.customer.fullname if order.customer else order.guest_name }} - {{ order.customer.phone if order.customer else order.guest_phone }}</p>
+            <p class="text-gray-300 mt-2"><strong>Địa chỉ:</strong> {{ order.shipping_address }}</p>
+            <p class="text-gray-300 mt-2"><strong>Hình thức:</strong> {{ order.payment_method }}</p>
+            <p class="text-gray-300 mt-2"><strong>Ngày đặt:</strong> {{ order.timestamp.strftime('%d/%m/%Y %H:%M') }}</p>
+        </div>
+    </div>
+
+    <div class="lg:col-span-1">
+        <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 sticky top-24">
+            <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Cập nhật trạng thái</h3>
+            
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-4">
+                    {{ form.status.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                    {{ form.status(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary") }}
+                </div>
+
+                <div class="mb-6">
+                    {{ form.payment_status.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                    {{ form.payment_status(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary") }}
+                </div>
+
+                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-black font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(57,255,20,0.3)]">
+                    Lưu thay đổi
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

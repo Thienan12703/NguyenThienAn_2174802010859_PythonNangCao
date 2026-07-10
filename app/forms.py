@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField, IntegerField, SelectField
+from flask_wtf.file import FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField, IntegerField, SelectField, MultipleFileField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
 from app.models import User
 
@@ -23,9 +24,15 @@ class RegistrationForm(FlaskForm):
 
 class CheckoutForm(FlaskForm):
     fullname = StringField('Họ và tên', validators=[DataRequired()])
+    email = StringField('Email nhận thông báo', validators=[DataRequired()])
     phone = StringField('Số điện thoại', validators=[DataRequired()])
     address = TextAreaField('Địa chỉ giao hàng', validators=[DataRequired()])
-    payment_method = SelectField('Phương thức thanh toán', choices=[('COD', 'Thanh toán khi nhận hàng (COD)')])
+    notes = TextAreaField('Ghi chú đơn hàng (Không bắt buộc)')
+    payment_method = SelectField('Phương thức thanh toán', choices=[
+        ('COD', 'Thanh toán khi nhận hàng (COD)'),
+        ('BANK', 'Chuyển khoản ngân hàng'),
+        ('MOMO', 'Ví điện tử MoMo')
+    ])
     submit = SubmitField('Xác nhận đặt hàng')
 
 class ReviewForm(FlaskForm):
@@ -36,9 +43,43 @@ class ReviewForm(FlaskForm):
 class ProductForm(FlaskForm):
     name = StringField('Tên sản phẩm', validators=[DataRequired()])
     price = FloatField('Giá', validators=[DataRequired()])
-    image = StringField('Link ảnh')
-    brand = StringField('Thương hiệu', validators=[DataRequired()])
+    images = MultipleFileField('Hình ảnh tải lên (có thể chọn nhiều ảnh)', render_kw={'multiple': True})
+    brand_id = SelectField('Thương hiệu', coerce=int)
     category_id = SelectField('Danh mục', coerce=int)
     description = TextAreaField('Mô tả')
     stock = IntegerField('Tồn kho', default=0)
     submit = SubmitField('Lưu sản phẩm')
+
+class BrandForm(FlaskForm):
+    name = StringField('Tên thương hiệu', validators=[DataRequired()])
+    submit = SubmitField('Lưu thương hiệu')
+
+class CategoryForm(FlaskForm):
+    name = StringField('Tên danh mục', validators=[DataRequired()])
+    submit = SubmitField('Lưu danh mục')
+
+class OrderStatusForm(FlaskForm):
+    status = SelectField('Trạng thái giao hàng', choices=[
+        ('Chờ duyệt', 'Chờ duyệt'), 
+        ('Đang chuẩn bị hàng', 'Đang chuẩn bị hàng'), 
+        ('Đã bàn giao đơn vị vận chuyển', 'Đã bàn giao đơn vị vận chuyển'), 
+        ('Giao hàng thành công', 'Giao hàng thành công')
+    ])
+    payment_status = SelectField('Tình trạng thanh toán', choices=[
+        ('Chưa thanh toán', 'Chưa thanh toán'), 
+        ('Đã thanh toán', 'Đã thanh toán')
+    ])
+    submit = SubmitField('Cập nhật')
+
+class BannerForm(FlaskForm):
+    title = StringField('Tiêu đề')
+    image = MultipleFileField('Hình ảnh Banner (có thể chọn nhiều ảnh)')
+    link = StringField('Link chuyển hướng (vd: /products)')
+    is_active = BooleanField('Đang hoạt động', default=True)
+    submit = SubmitField('Lưu Banner')
+
+class PostForm(FlaskForm):
+    title = StringField('Tiêu đề', validators=[DataRequired()])
+    thumbnail = MultipleFileField('Hình ảnh bài viết (có thể chọn nhiều ảnh)')
+    content = TextAreaField('Nội dung (hỗ trợ HTML)', validators=[DataRequired()])
+    submit = SubmitField('Lưu bài viết')

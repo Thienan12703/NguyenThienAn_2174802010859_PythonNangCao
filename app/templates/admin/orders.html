@@ -13,6 +13,7 @@
                     <th class="p-4">Ngày đặt</th>
                     <th class="p-4 text-right">Tổng tiền</th>
                     <th class="p-4 text-center">Trạng thái</th>
+                    <th class="p-4">Thao tác</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-800 text-sm">
@@ -20,22 +21,29 @@
                 <tr class="hover:bg-gray-800/50 transition-colors">
                     <td class="p-4 font-bold text-gray-300">#{{ o.id }}</td>
                     <td class="p-4">
-                        <div class="font-bold text-gray-200">{{ o.customer.username }}</div>
-                        <div class="text-gray-500 text-xs mt-1">{{ o.customer.email }}</div>
+                        <div class="font-bold text-gray-200">{{ o.customer.fullname if o.customer else o.guest_name }}</div>
+                        <div class="text-gray-500 text-xs mt-1">{{ o.customer.email if o.customer else o.guest_phone }}</div>
                     </td>
                     <td class="p-4 text-gray-400">{{ o.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
                     <td class="p-4 text-right font-black text-primary">{{ "{:,.0f}".format(o.total_price) }}đ</td>
                     <td class="p-4 text-center">
-                        {% if o.status == 'Pending' %}
-                        <span class="inline-block bg-yellow-900/30 text-yellow-500 border border-yellow-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Chờ xử lý</span>
+                        {% if o.status == 'Chờ duyệt' %}
+                        <span class="inline-block bg-yellow-900/30 text-yellow-500 border border-yellow-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Chờ duyệt</span>
+                        {% elif o.status == 'Đang chuẩn bị hàng' %}
+                        <span class="inline-block bg-blue-900/30 text-blue-500 border border-blue-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Chuẩn bị</span>
+                        {% elif o.status == 'Đã bàn giao đơn vị vận chuyển' %}
+                        <span class="inline-block bg-purple-900/30 text-purple-500 border border-purple-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Đang giao</span>
                         {% else %}
-                        <span class="inline-block bg-green-900/30 text-green-500 border border-green-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Hoàn thành</span>
+                        <span class="inline-block bg-green-900/30 text-green-500 border border-green-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Thành công</span>
                         {% endif %}
+                    </td>
+                    <td class="p-4">
+                        <a href="{{ url_for('admin.order_detail', id=o.id) }}" class="text-primary hover:underline font-bold text-xs uppercase">Chi tiết</a>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" class="p-8 text-center text-gray-500">Chưa có đơn hàng nào.</td>
+                    <td colspan="6" class="p-8 text-center text-gray-500">Chưa có đơn hàng nào.</td>
                 </tr>
                 {% endfor %}
             </tbody>
