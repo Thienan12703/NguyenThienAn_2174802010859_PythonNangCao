@@ -34,63 +34,48 @@ def call_gemini_api(prompt: str) -> str:
     """
     api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key:
-        raise Exception('GEMINI_API_KEY chưa được cấu hình trong biến môi trường.')
+        raise Exception('API Key chưa được cấu hình trong biến môi trường.')
 
     is_groq = api_key.startswith('gsk_')
+    is_cohere = len(api_key) == 40 and not api_key.startswith('AIza')
 
     if is_groq:
-        # Sử dụng Groq API (chuẩn OpenAI)
         url = 'https://api.groq.com/openai/v1/chat/completions'
-        payload = {
-            "model": "llama3-8b-8192",
-            "messages": [{"role": "user", "content": prompt}]
-        }
-        headers = {
-            'Content-Type': 'application/json; charset=utf-8',
-            'Authorization': f'Bearer {api_key}'
-        }
+        payload = {"model": "llama3-8b-8192", "messages": [{"role": "user", "content": prompt}]}
+        headers = {'Content-Type': 'application/json; charset=utf-8', 'Authorization': f'Bearer {api_key}'}
+    elif is_cohere:
+        url = 'https://api.cohere.ai/v1/chat'
+        payload = {"message": prompt + " (Hãy trả lời bằng tiếng Việt ngắn gọn)", "model": "command"}
+        headers = {'Content-Type': 'application/json; charset=utf-8', 'Authorization': f'Bearer {api_key}'}
     else:
-        # Sử dụng Gemini API
         url = f'{GEMINI_API_URL}?key={api_key}'
-        payload = {
-            "contents": [{"parts": [{"text": prompt}]}]
-        }
-        headers = {
-            'Content-Type': 'application/json; charset=utf-8',
-        }
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
 
-    # Chuyển dict Python → chuỗi JSON rồi encode sang bytes UTF-8
     payload_bytes = json.dumps(payload, ensure_ascii=False).encode('utf-8')
 
-    # Hỗ trợ proxy của PythonAnywhere free tier
     proxy_url = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY')
     if proxy_url:
-        proxy_handler = urllib.request.ProxyHandler({
-            'http': proxy_url,
-            'https': proxy_url
-        })
+        proxy_handler = urllib.request.ProxyHandler({'http': proxy_url, 'https': proxy_url})
         opener = urllib.request.build_opener(proxy_handler)
     else:
         opener = urllib.request.build_opener()
 
-    req = urllib.request.Request(
-        url=url,
-        data=payload_bytes,
-        headers=headers,
-        method='POST'
-    )
+    req = urllib.request.Request(url=url, data=payload_bytes, headers=headers, method='POST')
 
-    # Gửi request qua opener (có thể dùng proxy) và đọc response
-    with opener.open(req, timeout=30) as response:
-        response_body = response.read().decode('utf-8')
-
-    # Phân tích JSON response để lấy văn bản kết quả
-    data = json.loads(response_body)
-    
-    if is_groq:
-        return data['choices'][0]['message']['content']
-    else:
-        return data['candidates'][0]['content']['parts'][0]['text']
+    try:
+        with opener.open(req, timeout=30) as response:
+            response_body = response.read().decode('utf-8')
+            data = json.loads(response_body)
+            
+            if is_groq:
+                return data['choices'][0]['message']['content']
+            elif is_cohere:
+                return data['text']
+            else:
+                return data['candidates'][0]['content']['parts'][0]['text']
+    except Exception as e:
+        return f"Lỗi AI: Vui lòng kiểm tra lại API Key. Chi tiết: {str(e)}"
 
 
 @ai_bp.route('/generate-description', methods=['POST'])
