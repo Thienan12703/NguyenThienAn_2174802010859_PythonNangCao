@@ -1,35 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card p-4 shadow border-secondary">
-            <h3 class="mb-4 text-neon">Thanh Toán</h3>
-            <form method="POST" action="">
-                {{ form.hidden_tag() }}
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        {{ form.fullname.label(class="form-label") }}
-                        {{ form.fullname(class="form-control bg-dark text-light border-secondary", value=current_user.username) }}
+<div class="py-8 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-gray-900 rounded-2xl shadow-xl border border-gray-800 p-8">
+        <h2 class="text-2xl font-black uppercase italic mb-8 border-b border-gray-800 pb-4 text-white">Xác nhận thanh toán</h2>
+        
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            
+            <div class="space-y-6">
+                <!-- User Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        {{ form.fullname.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                        {{ form.fullname(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all", value=current_user.username) }}
                     </div>
-                    <div class="col-md-6 mb-3">
-                        {{ form.phone.label(class="form-label") }}
-                        {{ form.phone(class="form-control bg-dark text-light border-secondary") }}
+                    <div>
+                        {{ form.phone.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                        {{ form.phone(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all") }}
                     </div>
                 </div>
-                <div class="mb-3">
-                    {{ form.address.label(class="form-label") }}
-                    {{ form.address(class="form-control bg-dark text-light border-secondary", rows="3") }}
+
+                <div>
+                    {{ form.address.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                    {{ form.address(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all", rows="3") }}
                 </div>
-                <div class="mb-4">
-                    {{ form.payment_method.label(class="form-label") }}
-                    {{ form.payment_method(class="form-select bg-dark text-light border-secondary") }}
+
+                <!-- Payment Method -->
+                <div>
+                    {{ form.payment_method.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                    {{ form.payment_method(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all") }}
                 </div>
-                <div class="d-grid">
-                    {{ form.submit(class="btn btn-primary btn-lg") }}
-                </div>
-            </form>
-        </div>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-gray-800">
+                {{ form.submit(class="w-full bg-primary text-black font-bold uppercase tracking-wide py-4 rounded-xl hover:bg-primary-dark transition-all shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:shadow-[0_0_25px_rgba(57,255,20,0.5)]") }}
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

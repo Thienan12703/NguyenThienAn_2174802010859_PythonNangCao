@@ -1,50 +1,71 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h2 class="mb-4 text-neon">Tin Tức & Khuyến Mãi</h2>
-    </div>
-    
-    {% for post in posts %}
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100 bg-dark border-secondary">
-            <img src="{{ post.thumbnail or 'https://via.placeholder.com/600x400' }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
-            <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-light">{{ post.title }}</h5>
-                <p class="text-muted small"><i class="bi bi-clock"></i> {{ post.timestamp.strftime('%d/%m/%Y') }} | <i class="bi bi-person"></i> {{ post.author.username }}</p>
-                <p class="card-text text-muted" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                    {{ post.content | striptags }}
-                </p>
-                <button class="btn btn-outline-primary mt-auto" data-bs-toggle="modal" data-bs-target="#postModal{{ post.id }}">Đọc tiếp</button>
-            </div>
+<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-end mb-10">
+        <div>
+            <h1 class="text-3xl font-black uppercase italic tracking-wide text-white">Tin Tức & Sự Kiện</h1>
+            <div class="w-20 h-1 bg-primary mt-2"></div>
         </div>
     </div>
     
-    <!-- Modal for Post Detail -->
-    <div class="modal fade" id="postModal{{ post.id }}" tabindex="-1" aria-hidden="true" data-bs-theme="dark">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content bg-dark text-light border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title text-neon">{{ post.title }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for post in posts %}
+        <div class="bg-gray-900 rounded-2xl shadow-sm border border-gray-800 overflow-hidden group hover:shadow-[0_0_15px_rgba(57,255,20,0.2)] hover:border-primary/50 transition-all duration-300 flex flex-col">
+            <div class="relative h-48 overflow-hidden bg-gray-800">
+                <img src="{{ post.thumbnail or 'https://via.placeholder.com/600x400' }}" alt="{{ post.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="p-6 flex flex-col flex-1">
+                <div class="flex items-center text-xs text-gray-400 mb-3 space-x-4">
+                    <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> {{ post.timestamp.strftime('%d/%m/%Y') }}</span>
+                    <span class="flex items-center gap-1"><i class="fa-regular fa-user"></i> {{ post.author.username }}</span>
                 </div>
-                <div class="modal-body p-0">
-                    <img src="{{ post.thumbnail or 'https://via.placeholder.com/800x400' }}" class="img-fluid w-100" style="max-height: 400px; object-fit: cover;">
-                    <div class="p-4">
-                        <p class="text-muted"><i class="bi bi-clock"></i> {{ post.timestamp.strftime('%d/%m/%Y %H:%M') }}</p>
-                        <div style="line-height: 1.8;">
+                <h3 class="font-bold text-lg text-white mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                    {{ post.title }}
+                </h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 flex-1">
+                    {{ post.content | striptags }}
+                </p>
+                <button onclick="document.getElementById('postModal{{ post.id }}').classList.remove('hidden')" class="mt-auto text-primary font-bold text-sm uppercase tracking-wider flex items-center gap-2 hover:text-white transition-colors">
+                    Đọc tiếp <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal for Post Detail (Tailwind implementation) -->
+        <div id="postModal{{ post.id }}" class="hidden fixed inset-0 z-[100] overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true" onclick="document.getElementById('postModal{{ post.id }}').classList.add('hidden')">
+                    <div class="absolute inset-0 bg-black opacity-75"></div>
+                </div>
+
+                <div class="inline-block align-bottom bg-gray-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl w-full border border-gray-800">
+                    <div class="relative h-64 sm:h-80">
+                        <img src="{{ post.thumbnail or 'https://via.placeholder.com/800x400' }}" class="w-full h-full object-cover" />
+                        <button type="button" class="absolute top-4 right-4 bg-black/50 hover:bg-black/80 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center transition-colors backdrop-blur-sm" onclick="document.getElementById('postModal{{ post.id }}').classList.add('hidden')">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="px-6 py-8 sm:p-10">
+                        <h3 class="text-2xl sm:text-3xl font-black text-white mb-4">{{ post.title }}</h3>
+                        <div class="flex items-center text-sm text-gray-400 mb-8 pb-6 border-b border-gray-800">
+                            <span class="mr-6"><i class="fa-regular fa-clock mr-2 text-primary"></i>{{ post.timestamp.strftime('%d/%m/%Y %H:%M') }}</span>
+                            <span><i class="fa-regular fa-user mr-2 text-primary"></i>{{ post.author.username }}</span>
+                        </div>
+                        <div class="prose prose-invert prose-p:text-gray-300 prose-headings:text-white prose-a:text-primary max-w-none text-gray-300 leading-relaxed">
                             {{ post.content | safe }}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        {% else %}
+        <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20 bg-gray-900 rounded-3xl border border-gray-800 border-dashed">
+            <i class="fa-regular fa-newspaper text-5xl text-gray-600 mb-4"></i>
+            <h3 class="text-xl font-bold text-white mb-2">Chưa có bài viết nào</h3>
+            <p class="text-gray-400">Các tin tức và sự kiện mới nhất sẽ sớm được cập nhật tại đây.</p>
+        </div>
+        {% endfor %}
     </div>
-    {% else %}
-    <div class="col-12 text-center text-muted py-5">
-        <h4>Chưa có bài viết nào.</h4>
-    </div>
-    {% endfor %}
 </div>
 {% endblock %}

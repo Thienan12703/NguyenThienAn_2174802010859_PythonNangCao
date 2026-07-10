@@ -1,27 +1,35 @@
 {% extends "admin/layout.html" %}
 
 {% block admin_content %}
-<h2 class="mb-4">Tổng quan Hệ thống</h2>
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card bg-dark border-primary text-center p-4">
-            <i class="bi bi-box-seam text-primary mb-2" style="font-size: 2.5rem;"></i>
-            <h5 class="text-muted">Tổng Sản phẩm</h5>
-            <h2 class="text-neon">{{ total_products }}</h2>
+<h2 class="text-2xl font-black uppercase text-white mb-6">Tổng Quan Hệ Thống</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 flex items-center gap-4">
+        <div class="w-16 h-16 bg-blue-900/30 text-blue-500 rounded-xl flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-box"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-400 uppercase">Sản phẩm</p>
+            <p class="text-3xl font-black text-white">{{ total_products }}</p>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card bg-dark border-warning text-center p-4">
-            <i class="bi bi-cart-check text-warning mb-2" style="font-size: 2.5rem;"></i>
-            <h5 class="text-muted">Tổng Đơn hàng</h5>
-            <h2 class="text-warning">{{ total_orders }}</h2>
+    
+    <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 flex items-center gap-4">
+        <div class="w-16 h-16 bg-primary/20 text-primary rounded-xl flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-cart-shopping"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-400 uppercase">Đơn hàng</p>
+            <p class="text-3xl font-black text-white">{{ total_orders }}</p>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card bg-dark border-info text-center p-4">
-            <i class="bi bi-people text-info mb-2" style="font-size: 2.5rem;"></i>
-            <h5 class="text-muted">Khách hàng</h5>
-            <h2 class="text-info">{{ total_users }}</h2>
+
+    <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 flex items-center gap-4">
+        <div class="w-16 h-16 bg-purple-900/30 text-purple-400 rounded-xl flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-400 uppercase">Khách hàng</p>
+            <p class="text-3xl font-black text-white">{{ total_users }}</p>
         </div>
     </div>
 </div>

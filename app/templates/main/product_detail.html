@@ -1,101 +1,196 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-5">
-    <!-- Product Image -->
-    <div class="col-md-6 mb-4">
-        <div class="card p-2 border-0 bg-transparent">
-            <img src="{{ product.image or 'https://via.placeholder.com/800' }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
+<div class="py-8 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center text-sm text-gray-500 mb-8 font-medium">
+        <a href="{{ url_for('main.index') }}" class="hover:text-primary transition-colors">Trang chủ</a>
+        <i class="fa-solid fa-chevron-right mx-2 text-xs"></i>
+        <a href="{{ url_for('main.products') }}" class="hover:text-primary transition-colors">Sản phẩm</a>
+        <i class="fa-solid fa-chevron-right mx-2 text-xs"></i>
+        <span class="text-gray-100 truncate max-w-xs">{{ product.name }}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+        <!-- Images -->
+        <div class="md:col-span-7 flex flex-col-reverse sm:flex-row gap-4">
+            <div class="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-visible sm:w-24 shrink-0 scrollbar-hide">
+                <button class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 border-primary ring-2 ring-primary/30 transition-all">
+                    <img src="{{ product.image or 'https://via.placeholder.com/400' }}" alt="{{ product.name }}" class="w-full h-full object-cover mix-blend-multiply bg-gray-50" />
+                </button>
+            </div>
+            <div class="flex-1 bg-white rounded-2xl overflow-hidden relative group border border-gray-100">
+                <img 
+                    src="{{ product.image or 'https://via.placeholder.com/400' }}" 
+                    alt="{{ product.name }}" 
+                    class="w-full h-full object-contain cursor-zoom-in group-hover:scale-105 transition-transform duration-500 min-h-[400px] max-h-[600px] p-4" 
+                />
+                <span class="absolute top-4 left-4 bg-black text-primary text-xs font-black px-3 py-1.5 uppercase tracking-wider rounded-md border border-primary/30">HOT</span>
+            </div>
         </div>
-    </div>
-    
-    <!-- Product Info -->
-    <div class="col-md-6">
-        <h2 class="fw-bold">{{ product.name }}</h2>
-        <div class="d-flex align-items-center mb-3">
-            <span class="badge bg-secondary me-2 fs-6">{{ product.brand }}</span>
-            <span class="text-muted">Kho: {{ product.stock }}</span>
-        </div>
-        <h3 class="text-neon mb-4 display-6">{{ "{:,.0f}".format(product.price) }} VNĐ</h3>
-        
-        <form action="{{ url_for('main.add_to_cart', id=product.id) }}" method="POST" class="mb-5 p-4 rounded" style="background: rgba(255,255,255,0.05);">
-            <div class="row align-items-center">
-                <div class="col-4">
-                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control form-control-lg bg-dark text-light border-secondary">
+
+        <!-- Product Info -->
+        <div class="md:col-span-5 flex flex-col">
+            <div class="mb-2">
+                <span class="text-sm font-black text-gray-400 uppercase tracking-widest">{{ product.brand }}</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-black text-white leading-tight mb-4">{{ product.name }}</h1>
+            
+            <div class="flex items-center gap-4 mb-6">
+                <div class="flex items-center text-primary">
+                    {% for _ in range(5) %}<i class="fa-solid fa-star text-primary text-sm"></i>{% endfor %}
                 </div>
-                <div class="col-8">
-                    <button type="submit" class="btn btn-primary btn-lg w-100" {% if product.stock <= 0 %}disabled{% endif %}>
-                        {% if product.stock > 0 %}<i class="bi bi-cart-plus"></i> Thêm vào giỏ{% else %}Hết hàng{% endif %}
+                <span class="text-sm text-gray-400 font-medium">({{ reviews|length }} đánh giá)</span>
+                <span class="text-gray-600">|</span>
+                <span class="text-sm font-bold {% if product.stock > 0 %}text-green-500{% else %}text-red-500{% endif %}">
+                    {% if product.stock > 0 %}Còn {{ product.stock }} sản phẩm{% else %}Hết hàng{% endif %}
+                </span>
+            </div>
+
+            <div class="text-4xl font-black text-primary mb-6">
+                {{ "{:,.0f}".format(product.price) }}đ
+            </div>
+
+            <p class="text-gray-300 mb-8 leading-relaxed whitespace-pre-line">
+                {{ product.description }}
+            </p>
+
+            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 mb-8">
+                <form action="{{ url_for('main.add_to_cart', id=product.id) }}" method="POST">
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="font-bold text-gray-300">Số lượng:</span>
+                        <div class="flex items-center bg-black border border-gray-700 rounded-lg overflow-hidden">
+                            <button type="button" onclick="document.getElementById('qty').stepDown()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors font-bold" {% if product.stock == 0 %}disabled{% endif %}>-</button>
+                            <input
+                                type="number"
+                                name="quantity"
+                                id="qty"
+                                min="1"
+                                max="{{ product.stock if product.stock > 0 else 1 }}"
+                                value="1"
+                                class="w-12 text-center font-bold bg-transparent text-white focus:outline-none"
+                                {% if product.stock == 0 %}disabled{% endif %}
+                            />
+                            <button type="button" onclick="document.getElementById('qty').stepUp()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors font-bold" {% if product.stock == 0 %}disabled{% endif %}>+</button>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="w-full py-4 rounded-xl font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-all {% if product.stock == 0 %}bg-gray-700 text-gray-500 cursor-not-allowed{% else %}bg-primary text-black hover:bg-primary-dark shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)]{% endif %}"
+                        {% if product.stock == 0 %}disabled{% endif %}
+                    >
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        {% if product.stock == 0 %}Tạm Hết Hàng{% else %}Thêm Vào Giỏ{% endif %}
                     </button>
+                </form>
+            </div>
+
+            <div class="space-y-4 text-sm font-medium text-gray-400">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-shield-halved text-primary text-xl"></i>
+                    <span>Cam kết chính hãng 100%</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-truck-fast text-primary text-xl"></i>
+                    <span>Giao hàng toàn quốc siêu tốc</span>
                 </div>
             </div>
-        </form>
-        
-        <!-- AI Summary Feature -->
-        <div class="card bg-dark border-primary mb-4">
-            <div class="card-header border-primary d-flex justify-content-between align-items-center">
-                <span class="text-neon fw-bold"><i class="bi bi-robot"></i> AI Review Summary</span>
-                <button class="btn btn-sm btn-outline-primary" onclick="summarizeReviews({{ product.id }})">Tóm tắt ngay</button>
-            </div>
-            <div class="card-body">
-                <p id="ai-summary-result" class="card-text text-muted fst-italic">Bấm "Tóm tắt ngay" để AI của Google đọc toàn bộ bình luận và đưa ra đánh giá tổng quan giúp bạn.</p>
-            </div>
-        </div>
-
-        <h5 class="border-bottom border-secondary pb-2">Mô tả sản phẩm</h5>
-        <div class="text-muted" style="line-height: 1.8;">
-            {{ product.description }}
         </div>
     </div>
-</div>
 
-<!-- Reviews Section -->
-<div class="row">
-    <div class="col-md-8 mx-auto">
-        <h4 class="mb-4">Đánh giá từ khách hàng ({{ reviews|length }})</h4>
-        
-        <!-- Review Form -->
-        {% if current_user.is_authenticated %}
-        <div class="card p-4 mb-5 border-secondary">
-            <h5>Viết đánh giá của bạn</h5>
-            <form method="POST" action="">
-                {{ form.hidden_tag() }}
-                <div class="mb-3">
-                    {{ form.rating.label(class="form-label") }}
-                    {{ form.rating(class="form-select bg-dark text-light border-secondary w-25") }}
+    <!-- Reviews Section & AI Summary -->
+    <section class="mt-20 border-t border-gray-800 pt-16">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <!-- Review Form -->
+            <div class="lg:col-span-1">
+                <h2 class="text-2xl font-black uppercase italic mb-6 text-white">Đánh Giá Sản Phẩm</h2>
+                <div class="bg-gray-900 rounded-2xl p-6 border border-gray-800 text-center mb-8">
+                    <div class="text-5xl font-black text-white mb-2">5.0</div>
+                    <div class="flex justify-center text-primary mb-2">
+                        {% for _ in range(5) %}<i class="fa-solid fa-star text-sm mx-0.5"></i>{% endfor %}
+                    </div>
+                    <div class="text-sm text-gray-500 font-medium">{{ reviews|length }} bài đánh giá</div>
                 </div>
-                <div class="mb-3">
-                    {{ form.comment.label(class="form-label") }}
-                    {{ form.comment(class="form-control bg-dark text-light border-secondary", rows="3") }}
+
+                {% if current_user.is_authenticated %}
+                <div class="bg-gray-900 rounded-2xl p-6 border border-gray-800 shadow-sm">
+                    <h3 class="font-bold text-white mb-4">Viết đánh giá của bạn</h3>
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-4">
+                            {{ form.rating.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                            {{ form.rating(class="w-full bg-black text-white border border-gray-700 rounded p-2") }}
+                        </div>
+                        <div class="mb-4">
+                            {{ form.comment.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                            {{ form.comment(class="w-full px-4 py-3 bg-black border border-gray-700 text-white rounded-xl focus:outline-none focus:border-primary", rows="4", placeholder="Chia sẻ cảm nhận của bạn...") }}
+                        </div>
+                        {{ form.submit(class="w-full bg-surface-dark border border-gray-700 hover:border-primary text-white font-bold py-3 rounded-lg transition-all") }}
+                    </form>
                 </div>
-                {{ form.submit(class="btn btn-outline-primary") }}
-            </form>
-        </div>
-        {% else %}
-        <div class="alert alert-secondary text-center mb-5">
-            <a href="{{ url_for('auth.login') }}" class="text-neon">Đăng nhập</a> để viết đánh giá cho sản phẩm này.
-        </div>
-        {% endif %}
-        
-        <!-- Review List -->
-        <div class="list-group list-group-flush bg-transparent">
-            {% for r in reviews %}
-            <div class="list-group-item bg-transparent border-secondary text-light py-3">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1"><i class="bi bi-person-circle text-muted"></i> {{ r.author.username }}</h6>
-                    <small class="text-muted">{{ r.timestamp.strftime('%d/%m/%Y') }}</small>
+                {% else %}
+                <div class="bg-gray-900 rounded-2xl p-6 border border-gray-800 text-center">
+                    <p class="text-gray-400 mb-4">Vui lòng đăng nhập để đánh giá.</p>
+                    <a href="{{ url_for('auth.login') }}" class="text-primary hover:underline font-bold">Đăng nhập ngay</a>
                 </div>
-                <p class="mb-1 text-warning">
-                    {% for _ in range(r.rating) %}<i class="bi bi-star-fill"></i>{% endfor %}
-                    {% for _ in range(5 - r.rating) %}<i class="bi bi-star"></i>{% endfor %}
-                </p>
-                <p class="mb-1">{{ r.comment }}</p>
+                {% endif %}
             </div>
-            {% else %}
-            <p class="text-muted text-center">Chưa có đánh giá nào.</p>
-            {% endfor %}
+
+            <!-- Review List & AI -->
+            <div class="lg:col-span-2">
+                <!-- AI Review Summary feature -->
+                {% if reviews|length > 0 %}
+                <div class="bg-gradient-to-r from-purple-900/40 to-blue-900/40 rounded-2xl p-6 border border-purple-500/30 mb-10">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-purple-600/20 rounded-full flex items-center justify-center text-purple-400">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white">AI Tổng Hợp Đánh Giá</h3>
+                        </div>
+                        <button onclick="summarizeReviews({{ product.id }})" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-[0_0_15px_rgba(147,51,234,0.3)]">
+                            Tóm tắt ngay
+                        </button>
+                    </div>
+                    <div id="ai-summary-result" class="text-gray-300 italic text-sm leading-relaxed p-4 bg-black/30 rounded-xl border border-white/5">
+                        Nhấn nút để AI đọc toàn bộ bình luận và đưa ra cái nhìn tổng quan nhất giúp bạn dễ dàng quyết định!
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Review Items -->
+                <div class="space-y-6">
+                    {% for r in reviews %}
+                    <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 font-bold border border-gray-700">
+                                    {{ r.author.username[0] | upper }}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-200">{{ r.author.username }}</h4>
+                                    <div class="flex text-primary text-xs mt-1">
+                                        {% for _ in range(r.rating) %}<i class="fa-solid fa-star"></i>{% endfor %}
+                                        {% for _ in range(5 - r.rating) %}<i class="fa-regular fa-star"></i>{% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-500">{{ r.timestamp.strftime('%d/%m/%Y') }}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed">{{ r.comment }}</p>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-12 bg-gray-900 rounded-2xl border border-gray-800 border-dashed">
+                        <i class="fa-regular fa-comment-dots text-4xl text-gray-600 mb-3"></i>
+                        <h4 class="font-bold text-gray-300 mb-1">Chưa có đánh giá nào</h4>
+                        <p class="text-sm text-gray-500">Hãy là người đầu tiên đánh giá sản phẩm này!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}
 
@@ -103,18 +198,18 @@
 <script>
     async function summarizeReviews(productId) {
         const resultEl = document.getElementById('ai-summary-result');
-        resultEl.innerHTML = '<span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span> AI đang phân tích hàng ngàn đánh giá...';
+        resultEl.innerHTML = '<div class="flex items-center text-purple-400"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> AI đang phân tích dữ liệu...</div>';
         
         try {
             const response = await fetch(`/ai/summarize-reviews/${productId}`);
             const data = await response.json();
             if(data.summary) {
-                resultEl.innerHTML = `<strong class="text-light">${data.summary}</strong>`;
+                resultEl.innerHTML = `<p class="text-gray-100 font-medium">✨ ${data.summary}</p>`;
             } else {
-                resultEl.innerHTML = `<span class="text-danger">Lỗi: ${data.error}</span>`;
+                resultEl.innerHTML = `<span class="text-red-400">Lỗi: ${data.error}</span>`;
             }
         } catch (err) {
-            resultEl.innerHTML = `<span class="text-danger">Lỗi kết nối AI.</span>`;
+            resultEl.innerHTML = `<span class="text-red-400">Lỗi kết nối AI.</span>`;
         }
     }
 </script>

@@ -1,141 +1,193 @@
 <!DOCTYPE html>
-<html lang="vi" data-bs-theme="dark">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SmashPro - Đỉnh Cao Cầu Lông{% endblock %}</title>
-    <!-- Bootstrap CSS (Dark Theme - Cyborg) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome instead of Lucide React for Jinja2 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#39ff14',
+                        'primary-dark': '#32e612',
+                        'primary-light': '#5eff3d',
+                        surface: '#ffffff',
+                        'surface-dark': '#111111',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --bs-primary: #39ff14;
-            --bs-primary-rgb: 57, 255, 20;
-            --bs-body-bg: #111;
-            --bs-body-color: #eee;
-        }
-        body {
-            background-color: var(--bs-body-bg);
-            color: var(--bs-body-color);
-            font-family: 'Inter', sans-serif;
-        }
-        .navbar {
-            background-color: rgba(0, 0, 0, 0.8) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #333;
-        }
-        .text-neon {
-            color: var(--bs-primary) !important;
-            text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
-        }
-        .btn-primary {
-            background-color: var(--bs-primary);
-            border-color: var(--bs-primary);
-            color: #000;
-            font-weight: 600;
-        }
-        .btn-primary:hover {
-            background-color: #32e612;
-            border-color: #32e612;
-            color: #000;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
-        }
-        .card {
-            background-color: #1a1a1a;
-            border: 1px solid #333;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
+        body { background-color: #000; color: #fff; }
+        .text-neon { color: #39ff14; text-shadow: 0 0 10px rgba(57, 255, 20, 0.4); }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand text-neon fw-bold fs-3" href="{{ url_for('main.index') }}">
-                <i class="bi bi-lightning-charge-fill"></i> SmashPro
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <form class="d-flex mx-auto w-50" action="{{ url_for('main.products') }}" method="GET">
-                    <div class="input-group">
-                        <input class="form-control bg-dark text-light border-secondary" type="search" name="keyword" placeholder="Tìm kiếm vợt, giày..." value="{{ request.args.get('keyword', '') }}">
-                        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
-                        <button class="btn btn-outline-primary" type="button" onclick="alert('Tính năng AI Smart Search sẽ được nâng cấp!')"><i class="bi bi-magic"></i> AI</button>
-                    </div>
-                </form>
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.products') }}">Sản phẩm</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.posts') }}">Tin tức</a>
-                    </li>
-                    <li class="nav-item me-3">
-                        <a class="nav-link position-relative" href="{{ url_for('main.cart') }}">
-                            <i class="bi bi-cart3 fs-5"></i>
-                            {% set cart = session.get('cart', {}) %}
-                            {% if cart %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ cart.values() | sum }}
-                            </span>
-                            {% endif %}
-                        </a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                        {% if current_user.is_admin %}
-                        <li class="nav-item">
-                            <a class="nav-link text-warning" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-shield-lock"></i> Admin</a>
-                        </li>
+<body class="bg-black text-gray-100 min-h-screen flex flex-col font-sans">
+    
+    <!-- HEADER -->
+    <header class="bg-surface-dark text-white sticky top-0 z-50 border-b border-gray-800 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="{{ url_for('main.index') }}" class="text-3xl font-black italic tracking-wider">
+                        SMASH<span class="text-primary">PRO</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="{{ url_for('main.index') }}" class="text-gray-300 hover:text-primary font-medium transition-colors">Trang Chủ</a>
+                    <a href="{{ url_for('main.products') }}" class="text-gray-300 hover:text-primary font-medium transition-colors">Tất cả Sản phẩm</a>
+                    <a href="{{ url_for('main.posts') }}" class="text-gray-300 hover:text-primary font-medium transition-colors">Tin tức</a>
+                    <a href="#" class="text-gray-300 hover:text-primary font-medium transition-colors">Liên hệ</a>
+                </nav>
+
+                <!-- Search Bar -->
+                <div class="hidden lg:flex flex-1 max-w-md mx-8">
+                    <form action="{{ url_for('main.products') }}" method="GET" class="w-full flex items-center">
+                        <div class="relative w-full">
+                            <input 
+                                type="text" 
+                                name="keyword" 
+                                value="{{ request.args.get('keyword', '') }}"
+                                placeholder="Tìm kiếm vợt, giày..." 
+                                class="w-full bg-gray-900 text-white border border-gray-700 rounded-l-md py-2 pl-4 pr-10 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                            />
+                            <button type="submit" class="absolute right-0 top-0 bottom-0 px-3 text-gray-400 hover:text-primary">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                        <button type="button" onclick="alert('Tính năng AI Search đang nâng cấp')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-r-md font-bold transition-colors border border-purple-600">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right Actions -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <!-- Cart -->
+                    <a href="{{ url_for('main.cart') }}" class="relative text-gray-300 hover:text-primary transition-colors group">
+                        <i class="fa-solid fa-cart-shopping text-xl"></i>
+                        {% set cart = session.get('cart', {}) %}
+                        {% if cart %}
+                        <span class="absolute -top-2 -right-2 bg-primary text-black text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                            {{ cart.values() | sum }}
+                        </span>
                         {% endif %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                    </a>
+
+                    <!-- User Profile -->
+                    <div class="relative group">
+                        {% if current_user.is_authenticated %}
+                            <button class="flex items-center space-x-2 focus:outline-none">
+                                <div class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 hover:border-primary transition-colors">
+                                    <i class="fa-regular fa-user text-gray-300"></i>
+                                </div>
+                            </button>
+                            <!-- Dropdown Menu -->
+                            <div class="absolute right-0 mt-2 w-48 bg-surface-dark border border-gray-800 rounded-md shadow-xl py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="px-4 py-2 border-b border-gray-800">
+                                    <p class="text-sm font-medium text-white truncate">{{ current_user.username }}</p>
+                                    <p class="text-xs text-gray-400 truncate">{{ current_user.email }}</p>
+                                </div>
+                                {% if current_user.is_admin %}
+                                <a href="{{ url_for('admin.dashboard') }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-primary"><i class="fa-solid fa-shield-halved mr-2"></i>Admin Dashboard</a>
+                                {% endif %}
+                                <a href="{{ url_for('main.my_orders') }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-primary"><i class="fa-solid fa-box mr-2"></i>Đơn hàng của tôi</a>
+                                <div class="border-t border-gray-800"></div>
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-800"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Đăng xuất</a>
+                            </div>
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="bg-primary hover:bg-primary-dark text-black px-6 py-2 rounded-md font-bold transition-all shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)]">
+                                Đăng nhập
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                                <li><a class="dropdown-item" href="{{ url_for('main.my_orders') }}">Đơn hàng của tôi</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Đăng xuất</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="btn btn-primary rounded-pill px-4" href="{{ url_for('auth.login') }}">Đăng nhập</a>
-                        </li>
-                    {% endif %}
-                </ul>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <div class="container mt-4 mb-5 min-vh-100">
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
+                <div class="max-w-7xl mx-auto px-4 mt-4">
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    {% set color = 'green' if category == 'success' else 'red' if category == 'danger' else 'yellow' if category == 'warning' else 'blue' %}
+                    <div class="bg-{{ color }}-900 border border-{{ color }}-500 text-{{ color }}-100 px-4 py-3 rounded relative mb-4" role="alert">
+                        <span class="block sm:inline">{{ message }}</span>
                     </div>
                 {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
-        
-        {% block content %}{% endblock %}
-    </div>
 
-    <footer class="bg-black py-5 border-top border-secondary">
-        <div class="container text-center text-muted">
-            <h4 class="text-neon mb-3"><i class="bi bi-lightning-charge-fill"></i> SmashPro</h4>
-            <p>Hệ thống bán lẻ dụng cụ cầu lông số 1 Việt Nam</p>
-            <p class="mb-0">&copy; 2026 SmashPro. Đồ án môn Python Nâng Cao.</p>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-surface-dark text-gray-300 border-t border-gray-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-black text-white italic tracking-wider">
+                        SMASH<span class="text-primary">PRO</span>
+                    </h3>
+                    <p class="text-sm text-gray-400">
+                        Cửa hàng cầu lông chuyên nghiệp. Nơi cung cấp dụng cụ thể thao đỉnh cao cho đam mê của bạn.
+                    </p>
+                </div>
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wide">Sản phẩm</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ url_for('main.products', category_id=1) }}" class="hover:text-primary transition-colors">Vợt Cầu Lông</a></li>
+                        <li><a href="{{ url_for('main.products', category_id=2) }}" class="hover:text-primary transition-colors">Giày Cầu Lông</a></li>
+                        <li><a href="{{ url_for('main.products', category_id=3) }}" class="hover:text-primary transition-colors">Quần áo</a></li>
+                        <li><a href="{{ url_for('main.products', category_id=4) }}" class="hover:text-primary transition-colors">Túi / Balo</a></li>
+                    </ul>
+                </div>
+                <!-- Support -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wide">Hỗ trợ</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-primary transition-colors">Chính sách bảo hành</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Chính sách đổi trả</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Giao hàng & Thanh toán</a></li>
+                    </ul>
+                </div>
+                <!-- Contact -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-wide">Liên hệ</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start space-x-3">
+                            <i class="fa-solid fa-location-dot text-primary mt-1"></i>
+                            <span>123 Đường Cầu Lông, Quận Thể Thao, TP. HCM</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fa-solid fa-phone text-primary"></i>
+                            <span>0123 456 789</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

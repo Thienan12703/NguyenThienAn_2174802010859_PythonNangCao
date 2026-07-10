@@ -1,76 +1,129 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <!-- Sidebar / Filters -->
-    <div class="col-lg-3 mb-4">
-        <div class="card p-4 sticky-top" style="top: 80px; z-index: 1;">
-            <h4 class="mb-4 border-bottom border-secondary pb-2">Bộ Lọc</h4>
-            <form action="{{ url_for('main.products') }}" method="GET">
-                <div class="mb-3">
-                    <label class="form-label text-muted">Từ khóa</label>
-                    <input type="text" name="keyword" class="form-control bg-dark text-light border-secondary" value="{{ keyword }}">
+<div class="py-8 bg-gray-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row gap-8">
+        <!-- Sidebar Filter -->
+        <aside class="w-full md:w-64 shrink-0">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+                <div class="flex items-center gap-2 mb-6 text-gray-900 font-bold uppercase tracking-wider text-lg">
+                    <i class="fa-solid fa-filter"></i> BỘ LỌC
                 </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted">Danh mục</label>
-                    <select name="category_id" class="form-select bg-dark text-light border-secondary">
-                        <option value="">Tất cả danh mục</option>
-                        {% for cat in categories %}
-                        <option value="{{ cat.id }}" {% if category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-outline-primary w-100">Lọc Sản Phẩm</button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Product Grid -->
-    <div class="col-lg-9">
-        <h3 class="mb-4">Kết quả Tìm kiếm</h3>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-            {% for p in products %}
-            <div class="col">
-                <div class="card h-100 p-2">
-                    <img src="{{ p.image or 'https://via.placeholder.com/400' }}" class="card-img-top rounded" alt="{{ p.name }}" style="height: 200px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="card-title text-light mb-1">{{ p.name }}</h6>
-                        <p class="card-text text-muted small mb-2">{{ p.brand }}</p>
-                        <h5 class="text-neon mb-3">{{ "{:,.0f}".format(p.price) }} đ</h5>
-                        <div class="mt-auto d-flex gap-2">
-                            <a href="{{ url_for('main.product', id=p.id) }}" class="btn btn-outline-light btn-sm w-50">Chi tiết</a>
-                            <form action="{{ url_for('main.add_to_cart', id=p.id) }}" method="POST" class="w-50">
-                                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-cart-plus"></i></button>
-                            </form>
+
+                <form action="{{ url_for('main.products') }}" method="GET">
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tên sản phẩm</label>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                name="keyword"
+                                value="{{ request.args.get('keyword', '') }}"
+                                placeholder="Tìm kiếm..."
+                                class="w-full bg-gray-50 border border-gray-200 rounded-lg pl-3 pr-10 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-gray-900"
+                            />
+                            <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-gray-400"></i>
                         </div>
                     </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Danh mục</label>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <input
+                                    type="radio"
+                                    id="cat-all"
+                                    name="category_id"
+                                    value=""
+                                    {% if not category_id %}checked{% endif %}
+                                    class="text-primary focus:ring-primary h-4 w-4 border-gray-300"
+                                />
+                                <label for="cat-all" class="ml-2 text-sm text-gray-600">Tất cả</label>
+                            </div>
+                            {% for cat in categories %}
+                            <div class="flex items-center">
+                                <input
+                                    type="radio"
+                                    id="cat-{{ cat.id }}"
+                                    name="category_id"
+                                    value="{{ cat.id }}"
+                                    {% if category_id == cat.id %}checked{% endif %}
+                                    class="text-primary focus:ring-primary h-4 w-4 border-gray-300"
+                                />
+                                <label for="cat-{{ cat.id }}" class="ml-2 text-sm text-gray-600">{{ cat.name }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-surface-dark text-white font-bold uppercase tracking-wide py-3 rounded-lg hover:bg-black transition-colors">
+                        Áp dụng lọc
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl font-black italic tracking-wide uppercase text-gray-900">Danh Sách Sản Phẩm</h1>
+                <div class="text-sm text-gray-500 font-medium">Hiển thị {{ products|length }} kết quả</div>
+            </div>
+
+            {% if products|length == 0 %}
+                <div class="bg-gray-50 text-center py-16 rounded-2xl border border-dashed border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Không tìm thấy sản phẩm</h3>
+                    <p class="text-gray-500">Vui lòng thử điều chỉnh bộ lọc của bạn.</p>
                 </div>
-            </div>
             {% else %}
-            <div class="col-12 text-center text-muted my-5">
-                <h4>Không tìm thấy sản phẩm nào phù hợp.</h4>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <!-- Pagination -->
-        {% if pagination.pages > 1 %}
-        <nav class="mt-5">
-            <ul class="pagination justify-content-center" data-bs-theme="dark">
-                {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-                    {% if p %}
-                        {% if p == pagination.page %}
-                        <li class="page-item active"><a class="page-link bg-primary border-primary text-dark" href="#">{{ p }}</a></li>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {% for product in products %}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-lg transition-all duration-300">
+                        <a href="{{ url_for('main.product', id=product.id) }}" class="block relative h-60 overflow-hidden bg-gray-100">
+                            <img src="{{ product.image or 'https://via.placeholder.com/400' }}" alt="{{ product.name }}" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700 p-4" />
+                            {% if loop.index <= 2 %}
+                                <span class="absolute top-3 left-3 bg-black text-primary text-xs font-bold px-2 py-1 uppercase tracking-wider rounded">HOT</span>
+                            {% endif %}
+                        </a>
+                        <div class="p-5">
+                            <div class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">{{ product.brand }}</div>
+                            <a href="{{ url_for('main.product', id=product.id) }}">
+                                <h3 class="font-bold text-gray-900 text-lg line-clamp-1 group-hover:text-primary transition-colors h-7">{{ product.name }}</h3>
+                            </a>
+                            <div class="flex items-center justify-between mt-4">
+                                <span class="text-xl font-black text-surface-dark">{{ "{:,.0f}".format(product.price) }}đ</span>
+                                <form action="{{ url_for('main.add_to_cart', id=product.id) }}" method="POST">
+                                    <button type="submit" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-900 group-hover:bg-primary transition-colors">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if pagination.pages > 1 %}
+                <div class="mt-12 flex items-center justify-center gap-2">
+                    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if p %}
+                            {% if p == pagination.page %}
+                            <a href="#" class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors bg-primary text-black font-bold">
+                                {{ p }}
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('main.products', page=p, keyword=request.args.get('keyword', ''), category_id=request.args.get('category_id', '')) }}" class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-medium">
+                                {{ p }}
+                            </a>
+                            {% endif %}
                         {% else %}
-                        <li class="page-item"><a class="page-link text-light bg-dark border-secondary" href="{{ url_for('main.products', page=p, keyword=keyword, category_id=category_id) }}">{{ p }}</a></li>
+                            <span class="w-10 h-10 flex items-center justify-center text-gray-400">...</span>
                         {% endif %}
-                    {% else %}
-                        <li class="page-item disabled"><span class="page-link bg-dark border-secondary">...</span></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </nav>
-        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endif %}
+        </main>
     </div>
 </div>
 {% endblock %}

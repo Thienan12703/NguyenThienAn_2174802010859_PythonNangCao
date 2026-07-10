@@ -1,25 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <!-- Admin Sidebar -->
-    <div class="col-md-3 mb-4">
-        <div class="list-group list-group-flush bg-dark rounded border border-secondary">
-            <a href="{{ url_for('admin.dashboard') }}" class="list-group-item list-group-item-action bg-dark text-light border-secondary {% if request.endpoint == 'admin.dashboard' %}active bg-primary text-dark border-primary{% endif %}">
-                <i class="bi bi-speedometer2"></i> Tổng quan
-            </a>
-            <a href="{{ url_for('admin.products') }}" class="list-group-item list-group-item-action bg-dark text-light border-secondary {% if request.endpoint == 'admin.products' or request.endpoint == 'admin.new_product' or request.endpoint == 'admin.edit_product' %}active bg-primary text-dark border-primary{% endif %}">
-                <i class="bi bi-box-seam"></i> Quản lý Sản phẩm
-            </a>
-            <a href="{{ url_for('admin.orders') }}" class="list-group-item list-group-item-action bg-dark text-light border-secondary {% if request.endpoint == 'admin.orders' %}active bg-primary text-dark border-primary{% endif %}">
-                <i class="bi bi-cart-check"></i> Quản lý Đơn hàng
-            </a>
-        </div>
-    </div>
-    
-    <!-- Admin Content -->
-    <div class="col-md-9">
-        {% block admin_content %}{% endblock %}
+<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Admin Sidebar -->
+        <aside class="w-full lg:w-64 shrink-0">
+            <div class="bg-gray-900 rounded-2xl shadow-sm border border-gray-800 p-4 sticky top-24">
+                <h3 class="text-lg font-black uppercase text-white px-4 mb-4">Quản Trị Viên</h3>
+                <nav class="space-y-2">
+                    <a href="{{ url_for('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors {% if request.endpoint == 'admin.dashboard' %}bg-primary/20 text-primary font-bold{% else %}text-gray-400 hover:bg-gray-800 hover:text-white{% endif %}">
+                        <i class="fa-solid fa-chart-pie w-5"></i> Tổng quan
+                    </a>
+                    <a href="{{ url_for('admin.products') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors {% if 'product' in request.endpoint %}bg-primary/20 text-primary font-bold{% else %}text-gray-400 hover:bg-gray-800 hover:text-white{% endif %}">
+                        <i class="fa-solid fa-box w-5"></i> Sản phẩm
+                    </a>
+                    <a href="{{ url_for('admin.orders') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors {% if 'order' in request.endpoint %}bg-primary/20 text-primary font-bold{% else %}text-gray-400 hover:bg-gray-800 hover:text-white{% endif %}">
+                        <i class="fa-solid fa-clipboard-list w-5"></i> Đơn hàng
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Admin Content -->
+        <main class="flex-1 min-w-0">
+            {% block admin_content %}{% endblock %}
+        </main>
     </div>
 </div>
 {% endblock %}

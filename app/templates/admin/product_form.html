@@ -1,55 +1,60 @@
 {% extends "admin/layout.html" %}
 
 {% block admin_content %}
-<div class="card bg-dark border-secondary">
-    <div class="card-header border-secondary d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">{{ title }}</h4>
-        <a href="{{ url_for('admin.products') }}" class="btn btn-sm btn-outline-secondary">Quay lại</a>
+<div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 sm:p-8">
+    <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
+        <h2 class="text-2xl font-black uppercase text-white">{{ title }}</h2>
+        <a href="{{ url_for('admin.products') }}" class="text-gray-400 hover:text-white transition-colors">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại
+        </a>
     </div>
-    <div class="card-body">
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    {{ form.name.label(class="form-label") }}
-                    {{ form.name(class="form-control bg-dark text-light border-secondary") }}
-                    <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="generateDescAI()"><i class="bi bi-robot"></i> Tạo mô tả tự động (AI)</button>
-                </div>
-                <div class="col-md-6 mb-3">
-                    {{ form.brand.label(class="form-label") }}
-                    {{ form.brand(class="form-control bg-dark text-light border-secondary") }}
-                </div>
+
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                {{ form.name.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                {{ form.name(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", id="name") }}
+                <button type="button" class="mt-2 text-xs text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1 bg-purple-900/20 px-3 py-1.5 rounded-lg border border-purple-800 transition-colors" onclick="generateDescAI()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo mô tả tự động (AI)
+                </button>
             </div>
-            
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    {{ form.price.label(class="form-label") }}
-                    {{ form.price(class="form-control bg-dark text-light border-secondary") }}
-                </div>
-                <div class="col-md-4 mb-3">
-                    {{ form.stock.label(class="form-label") }}
-                    {{ form.stock(class="form-control bg-dark text-light border-secondary") }}
-                </div>
-                <div class="col-md-4 mb-3">
-                    {{ form.category_id.label(class="form-label") }}
-                    {{ form.category_id(class="form-select bg-dark text-light border-secondary") }}
-                </div>
+            <div>
+                {{ form.brand.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                {{ form.brand(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", id="brand") }}
             </div>
-            
-            <div class="mb-3">
-                {{ form.image.label(class="form-label") }}
-                {{ form.image(class="form-control bg-dark text-light border-secondary") }}
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+                {{ form.price.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                {{ form.price(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary") }}
             </div>
-            
-            <div class="mb-4">
-                {{ form.description.label(class="form-label") }}
-                {{ form.description(class="form-control bg-dark text-light border-secondary", rows="5", id="desc-field") }}
+            <div>
+                {{ form.stock.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                {{ form.stock(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary") }}
             </div>
-            
-            {{ form.submit(class="btn btn-primary") }}
-        </form>
-    </div>
+            <div>
+                {{ form.category_id.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+                {{ form.category_id(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary") }}
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            {{ form.image.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+            {{ form.image(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", placeholder="URL hình ảnh (VD: https://...)") }}
+        </div>
+        
+        <div class="mb-8">
+            {{ form.description.label(class="block text-sm font-semibold text-gray-300 mb-2") }}
+            {{ form.description(class="w-full bg-black text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-primary", rows="6", id="desc-field") }}
+        </div>
+        
+        <div class="flex justify-end">
+            {{ form.submit(class="bg-primary hover:bg-primary-dark text-black font-bold uppercase px-8 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(57,255,20,0.2)]") }}
+        </div>
+    </form>
 </div>
 {% endblock %}
 
@@ -64,9 +69,9 @@
             return;
         }
         
-        const btn = event.target;
+        const btn = event.target.closest('button');
         const originalText = btn.innerHTML;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang tạo...';
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang phân tích...';
         btn.disabled = true;
         
         try {

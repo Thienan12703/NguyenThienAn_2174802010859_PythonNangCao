@@ -1,48 +1,54 @@
 {% extends "admin/layout.html" %}
 
 {% block admin_content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Quản lý Sản phẩm</h2>
-    <a href="{{ url_for('admin.new_product') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Thêm Sản phẩm mới</a>
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <h2 class="text-2xl font-black uppercase text-white">Sản Phẩm</h2>
+    <a href="{{ url_for('admin.new_product') }}" class="bg-primary hover:bg-primary-dark text-black font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+        <i class="fa-solid fa-plus"></i> Thêm Sản Phẩm Mới
+    </a>
 </div>
 
-<div class="card bg-dark border-secondary">
-    <div class="table-responsive">
-        <table class="table table-dark table-hover mb-0 align-middle">
+<div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Hình ảnh</th>
-                    <th>Tên Sản Phẩm</th>
-                    <th>Giá</th>
-                    <th>Tồn kho</th>
-                    <th>Thao tác</th>
+                <tr class="bg-black/50 border-b border-gray-800 text-xs uppercase tracking-wider text-gray-400 font-bold">
+                    <th class="p-4">Hình ảnh</th>
+                    <th class="p-4">Tên Sản Phẩm</th>
+                    <th class="p-4">Giá</th>
+                    <th class="p-4">Tồn kho</th>
+                    <th class="p-4 text-right">Thao tác</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-800 text-sm">
                 {% for p in products %}
-                <tr>
-                    <td>{{ p.id }}</td>
-                    <td><img src="{{ p.image or 'https://via.placeholder.com/50' }}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded"></td>
-                    <td>{{ p.name }}</td>
-                    <td>{{ "{:,.0f}".format(p.price) }} đ</td>
-                    <td>
+                <tr class="hover:bg-gray-800/50 transition-colors">
+                    <td class="p-4">
+                        <img src="{{ p.image or 'https://via.placeholder.com/50' }}" class="w-12 h-12 rounded object-cover bg-white" alt="{{ p.name }}">
+                    </td>
+                    <td class="p-4 font-bold text-gray-200">
+                        {{ p.name }}
+                    </td>
+                    <td class="p-4 font-medium text-gray-400">
+                        {{ "{:,.0f}".format(p.price) }}đ
+                    </td>
+                    <td class="p-4">
                         {% if p.stock > 0 %}
-                        <span class="badge bg-success">{{ p.stock }}</span>
+                        <span class="bg-green-900/30 text-green-500 border border-green-800 px-2 py-1 rounded text-xs font-bold">{{ p.stock }}</span>
                         {% else %}
-                        <span class="badge bg-danger">Hết hàng</span>
+                        <span class="bg-red-900/30 text-red-500 border border-red-800 px-2 py-1 rounded text-xs font-bold">Hết hàng</span>
                         {% endif %}
                     </td>
-                    <td>
-                        <a href="{{ url_for('admin.edit_product', id=p.id) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-pencil"></i></a>
-                        <form action="{{ url_for('admin.delete_product', id=p.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    <td class="p-4 text-right">
+                        <a href="{{ url_for('admin.edit_product', id=p.id) }}" class="text-blue-400 hover:text-blue-300 mr-3 transition-colors"><i class="fa-solid fa-pen-to-square"></i></a>
+                        <form action="{{ url_for('admin.delete_product', id=p.id) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                            <button type="submit" class="text-red-500 hover:text-red-400 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
                         </form>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-4">Chưa có sản phẩm nào.</td>
+                    <td colspan="5" class="p-8 text-center text-gray-500">Chưa có sản phẩm nào.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -50,19 +56,20 @@
     </div>
 </div>
 
+<!-- Pagination -->
 {% if pagination.pages > 1 %}
-<nav class="mt-4">
-    <ul class="pagination justify-content-center" data-bs-theme="dark">
-        {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-            {% if p %}
-                <li class="page-item {% if p == pagination.page %}active{% endif %}">
-                    <a class="page-link {% if p == pagination.page %}bg-primary text-dark border-primary{% else %}bg-dark text-light border-secondary{% endif %}" href="{{ url_for('admin.products', page=p) }}">{{ p }}</a>
-                </li>
+<div class="mt-6 flex justify-center gap-2">
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+            {% if p == pagination.page %}
+            <span class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-black font-bold">{{ p }}</span>
             {% else %}
-                <li class="page-item disabled"><span class="page-link bg-dark border-secondary">...</span></li>
+            <a href="{{ url_for('admin.products', page=p) }}" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors font-medium">{{ p }}</a>
             {% endif %}
-        {% endfor %}
-    </ul>
-</nav>
+        {% else %}
+            <span class="w-10 h-10 flex items-center justify-center text-gray-600">...</span>
+        {% endif %}
+    {% endfor %}
+</div>
 {% endif %}
 {% endblock %}
