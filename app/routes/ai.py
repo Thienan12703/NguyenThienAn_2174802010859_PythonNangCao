@@ -68,6 +68,32 @@ def call_gemini_api(prompt: str) -> str:
             return "Sản phẩm cầu lông chính hãng với thiết kế hiện đại, công nghệ trợ lực tiên tiến giúp tối ưu hóa hiệu suất thi đấu. Chất liệu cao cấp mang lại độ bền vượt trội, phù hợp cho cả người chơi phong trào lẫn chuyên nghiệp."
         elif 'tóm tắt' in prompt.lower() or 'đánh giá' in prompt.lower():
             return "Phần lớn khách hàng đánh giá rất tích cực về chất lượng, độ bền và mẫu mã của sản phẩm. Tuy có một số ý kiến về giá thành, nhưng nhìn chung đây là một lựa chọn đáng tiền."
+        elif 'tìm kiếm ngữ nghĩa' in prompt:
+            import re
+            query_match = re.search(r'Người dùng tìm kiếm: "(.*?)"', prompt)
+            if query_match:
+                q = query_match.group(1).lower()
+                product_lines = [line for line in prompt.split('\n') if line.startswith('ID: ')]
+                matched_ids = []
+                for line in product_lines:
+                    # Trích xuất giá từ line
+                    price_match = re.search(r'Giá: (\d+\.?\d*)', line)
+                    price = float(price_match.group(1)) if price_match else 0
+                    
+                    # Giả lập AI tìm kiếm giá (ví dụ "2 triệu rưỡi")
+                    if 'triệu' in q and price >= 1000000:
+                        id_match = re.search(r'ID: (\d+)', line)
+                        if id_match: matched_ids.append(id_match.group(1))
+                        continue
+                    
+                    # Giả lập AI tìm kiếm từ khóa
+                    if any(word in line.lower() for word in q.split() if len(word) > 2):
+                        id_match = re.search(r'ID: (\d+)', line)
+                        if id_match: matched_ids.append(id_match.group(1))
+                        
+                if matched_ids:
+                    return ",".join(list(set(matched_ids))[:3]) # Trả về tối đa 3 ID
+            return "1,2" # Trả về mặc định nếu không tìm thấy gì
         else:
             return "Dựa trên dữ liệu hệ thống, đây là sản phẩm thuộc top bán chạy với nhiều tính năng vượt trội, mang đến trải nghiệm tuyệt vời cho người dùng."
 
