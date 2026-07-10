@@ -208,6 +208,30 @@ def search():
 
         # Lọc chỉ lấy chữ số và dấu phẩy để đảm bảo an toàn
         clean_result = "".join([c for c in result_text.strip() if c.isdigit() or c == ','])
+        
+        # Nếu AI trả về câu rác (chỉ có chữ hoặc dấu phẩy) mà không có số ID nào,
+        # Ta sẽ dùng thuật toán tìm kiếm thông minh cục bộ để chữa cháy!
+        if not any(c.isdigit() for c in clean_result):
+            query_lower = query.lower()
+            matched_ids = []
+            for p in products:
+                # Tìm theo giá
+                if 'triệu' in query_lower and p.price >= 1000000:
+                    matched_ids.append(str(p.id))
+                    continue
+                # Tìm theo từ khóa (tên, hãng, danh mục)
+                words = [w for w in query_lower.split() if len(w) > 2]
+                brand_name = p.brand.name.lower() if p.brand else ""
+                cat_name = p.category.name.lower() if p.category else ""
+                
+                if any(w in p.name.lower() or w in brand_name or w in cat_name for w in words):
+                    matched_ids.append(str(p.id))
+                    
+            if matched_ids:
+                clean_result = ",".join(list(set(matched_ids))[:4])
+            else:
+                clean_result = "1,2" # Mặc định trả về 2 sản phẩm đầu tiên nếu không khớp gì
+
         return jsonify({'ai_ids': clean_result})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
