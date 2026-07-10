@@ -51,6 +51,19 @@ def call_gemini_api(prompt: str) -> str:
 
     # Bước 2: Tạo HTTP request với headers đúng chuẩn
     url = f'{GEMINI_API_URL}?key={api_key}'
+
+    # Hỗ trợ proxy của PythonAnywhere free tier
+    # PythonAnywhere yêu cầu dùng proxy để kết nối các domain bên ngoài
+    proxy_url = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY')
+    if proxy_url:
+        proxy_handler = urllib.request.ProxyHandler({
+            'http': proxy_url,
+            'https': proxy_url
+        })
+        opener = urllib.request.build_opener(proxy_handler)
+    else:
+        opener = urllib.request.build_opener()
+
     req = urllib.request.Request(
         url=url,
         data=payload_bytes,
@@ -60,8 +73,8 @@ def call_gemini_api(prompt: str) -> str:
         method='POST'
     )
 
-    # Bước 3: Gửi request và đọc response
-    with urllib.request.urlopen(req, timeout=30) as response:
+    # Bước 3: Gửi request qua opener (có thể dùng proxy) và đọc response
+    with opener.open(req, timeout=30) as response:
         response_body = response.read().decode('utf-8')
 
     # Bước 4: Phân tích JSON response để lấy văn bản kết quả
