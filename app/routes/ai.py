@@ -45,7 +45,7 @@ def call_gemini_api(prompt: str) -> str:
         headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {api_key}'}
     elif is_cohere:
         url = 'https://api.cohere.ai/v1/chat'
-        payload = {"message": prompt + " (Hãy trả lời bằng tiếng Việt ngắn gọn)", "model": "command-r-plus"}
+        payload = {"message": prompt + " (Hãy trả lời bằng tiếng Việt ngắn gọn)"}
         headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {api_key}', 'Accept': 'application/json'}
     else:
         url = f'{GEMINI_API_URL}?key={api_key}'
