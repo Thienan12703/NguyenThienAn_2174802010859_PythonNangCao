@@ -42,15 +42,15 @@ def call_gemini_api(prompt: str) -> str:
     if is_groq:
         url = 'https://api.groq.com/openai/v1/chat/completions'
         payload = {"model": "llama3-8b-8192", "messages": [{"role": "user", "content": prompt}]}
-        headers = {'Content-Type': 'application/json; charset=utf-8', 'Authorization': f'Bearer {api_key}'}
+        headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {api_key}'}
     elif is_cohere:
         url = 'https://api.cohere.ai/v1/chat'
-        payload = {"message": prompt + " (Hãy trả lời bằng tiếng Việt ngắn gọn)", "model": "command"}
-        headers = {'Content-Type': 'application/json; charset=utf-8', 'Authorization': f'Bearer {api_key}'}
+        payload = {"message": prompt + " (Hãy trả lời bằng tiếng Việt ngắn gọn)", "model": "command-r"}
+        headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {api_key}', 'Accept': 'application/json'}
     else:
         url = f'{GEMINI_API_URL}?key={api_key}'
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
-        headers = {'Content-Type': 'application/json; charset=utf-8'}
+        headers = {'Content-Type': 'application/json'}
 
     payload_bytes = json.dumps(payload, ensure_ascii=False).encode('utf-8')
 
@@ -74,8 +74,11 @@ def call_gemini_api(prompt: str) -> str:
                 return data['text']
             else:
                 return data['candidates'][0]['content']['parts'][0]['text']
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8')
+        return f"Lỗi AI ({e.code}): {error_body}"
     except Exception as e:
-        return f"Lỗi AI: Vui lòng kiểm tra lại API Key. Chi tiết: {str(e)}"
+        return f"Lỗi AI: Vui lòng kiểm tra lại. Chi tiết: {str(e)}"
 
 
 @ai_bp.route('/generate-description', methods=['POST'])
