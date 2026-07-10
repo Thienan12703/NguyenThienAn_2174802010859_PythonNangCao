@@ -224,7 +224,7 @@ def search():
                 brand_name = p.brand.name.lower() if p.brand else ""
                 cat_name = p.category.name.lower() if p.category else ""
                 
-                if any(w in p.name.lower() or w in brand_name or w in cat_name for w in words):
+                if all(w in p.name.lower() or w in brand_name or w in cat_name for w in words):
                     matched_ids.append(str(p.id))
                     
             if matched_ids:
