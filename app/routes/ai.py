@@ -214,18 +214,43 @@ def search():
         if not any(c.isdigit() for c in clean_result):
             query_lower = query.lower()
             matched_ids = []
+            
+            # Phân tích yêu cầu về giá (giả lập AI NLP)
+            max_price = float('inf')
+            min_price = 0
+            if 'dưới' in query_lower or 'rẻ' in query_lower:
+                if '2 tr 5' in query_lower or '2.5' in query_lower or '2 triệu rưỡi' in query_lower:
+                    max_price = 2500000
+                elif '3 tr' in query_lower or '3 triệu' in query_lower:
+                    max_price = 3000000
+                elif '2 tr' in query_lower or '2 triệu' in query_lower:
+                    max_price = 2000000
+                elif '1 tr' in query_lower or '1 triệu' in query_lower:
+                    max_price = 1000000
+            elif 'trên' in query_lower or 'hơn' in query_lower:
+                if '2 tr' in query_lower or '2 triệu' in query_lower:
+                    min_price = 2000000
+                elif '1 tr' in query_lower or '1 triệu' in query_lower:
+                    min_price = 1000000
+            elif 'triệu' in query_lower:
+                # Nếu chỉ nói chung chung '2 triệu'
+                if '2 tr 5' in query_lower or 'rưỡi' in query_lower:
+                    min_price, max_price = 2000000, 3000000
+                elif '2 tr' in query_lower or '2 triệu' in query_lower:
+                    min_price, max_price = 1500000, 2500000
+                    
+            # Lọc các từ khóa không mang ý nghĩa tên sản phẩm
+            ignore_words = ['dưới', 'trên', 'khoảng', 'triệu', 'tr', 'rưỡi', 'giá', 'hơn', 'tầm', 'khoảng', 'của']
+            words = [w for w in query_lower.split() if len(w) > 2 and w not in ignore_words and not w.isdigit()]
+            
             for p in products:
-                # Tìm theo giá
-                if 'triệu' in query_lower and p.price >= 1000000:
-                    matched_ids.append(str(p.id))
-                    continue
-                # Tìm theo từ khóa (tên, hãng, danh mục)
-                words = [w for w in query_lower.split() if len(w) > 2]
                 brand_name = p.brand.name.lower() if p.brand else ""
                 cat_name = p.category.name.lower() if p.category else ""
                 
-                if all(w in p.name.lower() or w in brand_name or w in cat_name for w in words):
-                    matched_ids.append(str(p.id))
+                # Kiểm tra cả giá và từ khóa
+                if min_price <= p.price <= max_price:
+                    if not words or all(w in p.name.lower() or w in brand_name or w in cat_name for w in words):
+                        matched_ids.append(str(p.id))
                     
             if matched_ids:
                 clean_result = ",".join(list(set(matched_ids))[:4])
