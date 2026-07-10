@@ -36,24 +36,33 @@ def call_gemini_api(prompt: str) -> str:
     if not api_key:
         raise Exception('GEMINI_API_KEY chưa được cấu hình trong biến môi trường.')
 
-    # Bước 1: Xây dựng payload JSON theo chuẩn Gemini REST API
-    payload = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": prompt}
-                ]
-            }
-        ]
-    }
+    is_groq = api_key.startswith('gsk_')
+
+    if is_groq:
+        # Sử dụng Groq API (chuẩn OpenAI)
+        url = 'https://api.groq.com/openai/v1/chat/completions'
+        payload = {
+            "model": "llama3-8b-8192",
+            "messages": [{"role": "user", "content": prompt}]
+        }
+        headers = {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Authorization': f'Bearer {api_key}'
+        }
+    else:
+        # Sử dụng Gemini API
+        url = f'{GEMINI_API_URL}?key={api_key}'
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}]
+        }
+        headers = {
+            'Content-Type': 'application/json; charset=utf-8',
+        }
+
     # Chuyển dict Python → chuỗi JSON rồi encode sang bytes UTF-8
     payload_bytes = json.dumps(payload, ensure_ascii=False).encode('utf-8')
 
-    # Bước 2: Tạo HTTP request với headers đúng chuẩn
-    url = f'{GEMINI_API_URL}?key={api_key}'
-
     # Hỗ trợ proxy của PythonAnywhere free tier
-    # PythonAnywhere yêu cầu dùng proxy để kết nối các domain bên ngoài
     proxy_url = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY')
     if proxy_url:
         proxy_handler = urllib.request.ProxyHandler({
@@ -67,20 +76,21 @@ def call_gemini_api(prompt: str) -> str:
     req = urllib.request.Request(
         url=url,
         data=payload_bytes,
-        headers={
-            'Content-Type': 'application/json; charset=utf-8',
-        },
+        headers=headers,
         method='POST'
     )
 
-    # Bước 3: Gửi request qua opener (có thể dùng proxy) và đọc response
+    # Gửi request qua opener (có thể dùng proxy) và đọc response
     with opener.open(req, timeout=30) as response:
         response_body = response.read().decode('utf-8')
 
-    # Bước 4: Phân tích JSON response để lấy văn bản kết quả
-    response_data = json.loads(response_body)
-    generated_text = response_data['candidates'][0]['content']['parts'][0]['text']
-    return generated_text
+    # Phân tích JSON response để lấy văn bản kết quả
+    data = json.loads(response_body)
+    
+    if is_groq:
+        return data['choices'][0]['message']['content']
+    else:
+        return data['candidates'][0]['content']['parts'][0]['text']
 
 
 @ai_bp.route('/generate-description', methods=['POST'])
