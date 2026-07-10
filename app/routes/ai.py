@@ -64,9 +64,17 @@ def call_gemini_api(prompt: str) -> str:
     req = urllib.request.Request(url=url, data=payload_bytes, headers=headers, method='POST')
 
     def get_fallback_response():
-        if 'mô tả' in prompt.lower():
-            return "Sản phẩm cầu lông chính hãng với thiết kế hiện đại, công nghệ trợ lực tiên tiến giúp tối ưu hóa hiệu suất thi đấu. Chất liệu cao cấp mang lại độ bền vượt trội, phù hợp cho cả người chơi phong trào lẫn chuyên nghiệp."
-        elif 'tóm tắt' in prompt.lower() or 'đánh giá' in prompt.lower():
+        prompt_lower = prompt.lower()
+        if 'mô tả' in prompt_lower:
+            if 'balo' in prompt_lower or 'túi' in prompt_lower:
+                return "Sản phẩm được thiết kế với không gian chứa đồ rộng rãi, nhiều ngăn tiện lợi giúp bảo vệ vợt và các phụ kiện an toàn. Chất liệu vải chống thấm nước cao cấp, quai đeo êm ái mang lại sự thoải mái tối đa khi di chuyển."
+            elif 'giày' in prompt_lower:
+                return "Mẫu giày cầu lông mang đến sự êm ái vượt trội nhờ bộ đệm giảm chấn cao cấp, bảo vệ cổ chân hoàn hảo trong những pha di chuyển cường độ cao. Đế giày bám sân tốt, chống trượt, form dáng ôm sát chân tạo cảm giác cực kỳ tự tin."
+            elif 'áo' in prompt_lower or 'quần' in prompt_lower:
+                return "Trang phục thể thao chính hãng với chất liệu thun lạnh co giãn 4 chiều, siêu nhẹ và siêu thoáng khí. Công nghệ thấm hút mồ hôi nhanh giúp cơ thể luôn khô ráo, thoải mái trong suốt trận đấu căng thẳng."
+            else:
+                return "Sản phẩm cầu lông chính hãng với thiết kế hiện đại, công nghệ tiên tiến giúp tối ưu hóa hiệu suất thi đấu. Chất liệu cao cấp mang lại độ bền vượt trội, phù hợp cho cả người chơi phong trào lẫn chuyên nghiệp."
+        elif 'tóm tắt' in prompt_lower or 'đánh giá' in prompt_lower:
             return "Phần lớn khách hàng đánh giá rất tích cực về chất lượng, độ bền và mẫu mã của sản phẩm. Tuy có một số ý kiến về giá thành, nhưng nhìn chung đây là một lựa chọn đáng tiền."
         elif 'tìm kiếm ngữ nghĩa' in prompt:
             import re
