@@ -1,36 +1,14 @@
-version: '3.9'
+version: '3.8'
+
 services:
-  mongo:
-    image: mongo:7.0
-    restart: unless-stopped
-    volumes:
-      - mongo-data:/data/db
+  web:
+    build: .
     ports:
-      - '27017:27017'
-
-  backend:
-    build:
-      context: ./backend
-    env_file:
-      - ./backend/.env
+      - "8000:8000"
     environment:
-      MONGO_URI: mongodb://mongo:27017/badminton-shop
-      CLIENT_URL: http://localhost:5173
-      NODE_ENV: production
-      PORT: 8000
-    ports:
-      - '8000:8000'
-    depends_on:
-      - mongo
-
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_URL: http://backend:8000
-    ports:
-      - '5173:80'
-    depends_on:
-      - backend
-volumes:
-  mongo-data:
+      - FLASK_APP=run.py
+      - FLASK_ENV=production
+    volumes:
+      - ./.env:/app/.env
+      - ./app.db:/app/app.db
+    restart: always
